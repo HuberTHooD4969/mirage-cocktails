@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Environment secrets
+.env
+
+# Database & logs (local runtime data)
+data/bookings.json
+data/mirage.db
+logs/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Original photo assets (already copied to public/assets/)
+photo_2026-06-08_01-25-52.jpg
+photo_2026-06-08_01-25-52 (2).jpg

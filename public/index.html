@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Book Mirage Cocktails for your events. Premium mobile cocktail bar service offering Silver, Gold, and Premium signature drink packages.">
+    <title>Mirage Cocktails - Premium Mobile Bar Booking</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+</head>
+<body>
+    <!-- Ambient 3D Parallax Background elements -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+    
+    <div class="floating-particle float-1"><i class="fa-solid fa-lemon"></i></div>
+    <div class="floating-particle float-2"><i class="fa-solid fa-glass-martini-alt"></i></div>
+    <div class="floating-particle float-3"><i class="fa-solid fa-cubes"></i></div>
+    <div class="floating-particle float-4"><i class="fa-solid fa-star"></i></div>
+    <div class="floating-particle float-5"><i class="fa-solid fa-leaf"></i></div>
+
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo-area">
+                <img src="assets/logo.jpg" alt="Mirage Cocktails Logo" class="nav-logo" id="navLogo">
+                <span class="brand-name">MIRAGE <span class="gold-text">COCKTAILS</span></span>
+            </a>
+            <nav class="navbar" id="navbar">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#packages" class="nav-link">Packages</a>
+                <a href="#booking" class="nav-link nav-btn">Book Now</a>
+                <a href="#terms" class="nav-link">Terms</a>
+            </nav>
+            <div class="mobile-toggle" id="mobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="about">
+        <div class="hero-content scroll-reveal reveal-left">
+            <div class="badge">Signature Mobile Bar Services</div>
+            <h1 class="hero-title">Creating Memories <br><span class="gold-gradient-text">Worth Sharing</span></h1>
+            <p class="hero-subtitle">Bespoke vintage & signature cocktail menu styling, customized bar setups, and elite mixologists serving your events with flawless style.</p>
+            <div class="hero-actions">
+                <a href="#packages" class="btn btn-secondary">Explore Packages</a>
+                <a href="#booking" class="btn btn-primary">Book an Event <i class="fa-solid fa-arrow-right icon-right"></i></a>
+            </div>
+        </div>
+        
+        <!-- Interactive 3D Card showcasing the Brand Logo -->
+        <div class="hero-flyer-container scroll-reveal reveal-right delay-2">
+            <div class="flyer-card-3d" id="flyerCard">
+                <div class="card-glass-shine"></div>
+                <div class="flyer-inner" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; gap: 1.5rem;">
+                    <img src="assets/logo.jpg" alt="Mirage Cocktails Logo" style="width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--gold); box-shadow: 0 0 25px var(--gold-glow); object-fit: cover;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--gold-light); margin: 0;">MIRAGE COCKTAILS</h3>
+                    <div style="width: 40px; height: 2px; background: var(--gold);"></div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; font-style: italic; font-family: var(--font-heading); margin: 0;">"Creating Memories Worth Sharing"</p>
+                    <div style="margin-top: 1rem; font-size: 0.8rem; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); padding: 6px 14px; border-radius: 20px; color: var(--gold-light); font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-glass-martini-alt"></i> Mobile Bar Services
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Transition Strip -->
+    <div class="section-transition-strip scroll-reveal"></div>
+
+    <!-- Packages Section -->
+    <section class="packages-section" id="packages">
+        <div class="section-header scroll-reveal reveal-up">
+            <span class="gold-text uppercase tracking-wide">Elevate Your Guest Experience</span>
+            <h2 class="section-title">Our Standardized Packages</h2>
+            <div class="gold-divider"></div>
+            <p class="section-subtitle">Select a curated package tailored for your party size. All options include transportation and exceptional mixology workmanship.</p>
+        </div>
+
+        <div class="packages-grid">
+            <!-- Silver Package Card -->
+            <div class="package-card scroll-reveal reveal-up delay-1" data-package="silver" id="cardSilver">
+                <div class="card-glass-shine"></div>
+                <div class="package-header">
+                    <h3 class="package-tier">Silver Package</h3>
+                    <div class="package-guest-limit"><i class="fa-solid fa-users"></i> 70 - 100 Guests</div>
+                </div>
+                <div class="package-price">
+                    <span class="currency">GHC</span> <span class="price-val">8,000</span>
+                </div>
+                <ul class="package-features">
+                    <li><i class="fa-solid fa-circle-check"></i> Signature Cocktails</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Premium Mocktails</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Atmospheric Dry Ice Effect</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Branded Cups & Glasses</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Professional Bartenders</li>
+                </ul>
+                <div class="package-footer">
+                    <a href="#booking" class="btn btn-select-pkg" data-pkg-select="silver">Select Silver</a>
+                </div>
+            </div>
+
+            <!-- Gold Package Card (Highlighted) -->
+            <div class="package-card featured scroll-reveal reveal-up delay-2" data-package="gold" id="cardGold">
+                <div class="card-glass-shine"></div>
+                <div class="featured-badge"><i class="fa-solid fa-star"></i> MOST POPULAR</div>
+                <div class="package-header">
+                    <h3 class="package-tier">Gold Package</h3>
+                    <div class="package-guest-limit"><i class="fa-solid fa-users"></i> 100 - 150 Guests</div>
+                </div>
+                <div class="package-price">
+                    <span class="currency">GHC</span> <span class="price-val">9,500</span>
+                </div>
+                <ul class="package-features">
+                    <li><i class="fa-solid fa-circle-check"></i> Signature Cocktails</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Custom Crafted Mocktails</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Atmospheric Dry Ice Effect</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Bespoke Custom Menu Cards</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Branded Cups & Glasses</li>
+                    <li><i class="fa-solid fa-circle-check"></i> High-End Glassware</li>
+                </ul>
+                <div class="package-footer">
+                    <a href="#booking" class="btn btn-primary btn-select-pkg" data-pkg-select="gold">Select Gold</a>
+                </div>
+            </div>
+
+            <!-- Premium Package Card -->
+            <div class="package-card scroll-reveal reveal-up delay-3" data-package="premium" id="cardPremium">
+                <div class="card-glass-shine"></div>
+                <div class="package-header">
+                    <h3 class="package-tier">Premium Package</h3>
+                    <div class="package-guest-limit"><i class="fa-solid fa-users"></i> 150 - 200+ Guests</div>
+                </div>
+                <div class="package-price">
+                    <span class="currency">GHC</span> <span class="price-val">11,500</span>
+                </div>
+                <ul class="package-features">
+                    <li><i class="fa-solid fa-circle-check"></i> Top-Shelf Premium Selection</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Signature Mocktails</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Full Dry Ice Experience</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Curated Custom Cocktail Menu</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Branded Cups, Glasses & Garnishes</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Priority Setup & Dedicated Service</li>
+                </ul>
+                <div class="package-footer">
+                    <a href="#booking" class="btn btn-select-pkg" data-pkg-select="premium">Select Premium</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Transition Strip -->
+    <div class="section-transition-strip scroll-reveal"></div>
+
+    <!-- Booking Section with step flow -->
+    <section class="booking-section" id="booking">
+        <div class="section-header scroll-reveal reveal-up">
+            <span class="gold-text uppercase tracking-wide">Reserve the Date</span>
+            <h2 class="section-title">Schedule Your Mobile Bar</h2>
+            <div class="gold-divider"></div>
+        </div>
+
+        <div class="booking-3d-wrapper scroll-reveal reveal-up delay-1">
+            <!-- 3D Flipping Form Card Container -->
+            <div class="booking-card-3d" id="bookingCard">
+                <!-- FRONT OF CARD (Step 1: Event Configurator) -->
+                <div class="booking-card-side active-step" id="step1Side">
+                    <div class="booking-card-content">
+                        <div class="step-indicator">
+                            <span class="step-num active">1</span>
+                            <span class="step-line"></span>
+                            <span class="step-num">2</span>
+                            <span class="step-line"></span>
+                            <span class="step-num">3</span>
+                            <span class="step-line"></span>
+                            <span class="step-num">4</span>
+                        </div>
+                        
+                        <h3 class="form-side-title"><i class="fa-solid fa-sliders gold-text"></i> Step 1: Configurator</h3>
+                        <p class="form-side-desc">Customize guest sizes, event durations, transport billing, and pick dates.</p>
+                        
+                        <div class="booking-form-grid">
+                            <div class="form-group">
+                                <label for="formPackage"><i class="fa-solid fa-wine-glass-empty"></i> Package</label>
+                                <select id="formPackage" required>
+                                    <option value="" disabled selected>Choose package...</option>
+                                    <option value="silver">Silver Tier (70-100 guests)</option>
+                                    <option value="gold">Gold Tier (100-150 guests)</option>
+                                    <option value="premium">Premium Tier (150-200+ guests)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="formGuests"><i class="fa-solid fa-users"></i> Guest Size</label>
+                                <input type="number" id="formGuests" placeholder="e.g. 100" min="1" max="1000" required>
+                            </div>
+
+                            <div class="form-group span-full">
+                                <label for="formDuration"><i class="fa-solid fa-clock"></i> Duration: <span id="durationVal" class="gold-text font-bold">5 Hours</span></label>
+                                <input type="range" id="formDuration" min="5" max="10" value="5" class="slider">
+                                <small class="form-help">Base package covers 5 hours. GHC 1,000/hr for extra hours.</small>
+                            </div>
+
+                            <div class="form-group span-full">
+                                <label for="formDistance"><i class="fa-solid fa-truck"></i> Distance: <span id="distanceVal" class="gold-text font-bold">0 KM</span> (+GHC 0)</label>
+                                <input type="range" id="formDistance" min="0" max="100" value="0" class="slider">
+                                <small class="form-help">Calculated from Accra HQ at GHC 15/KM transport fee.</small>
+                            </div>
+
+                            <div class="form-group span-full">
+                                <label><i class="fa-solid fa-calendar-check"></i> Availability Calendar</label>
+                                <div class="calendar-wrapper">
+                                    <div class="calendar-header">
+                                        <button type="button" class="btn-cal-nav" id="btnPrevMonth"><i class="fa-solid fa-chevron-left"></i></button>
+                                        <span id="calMonthYear" class="font-semibold gold-text">Month Year</span>
+                                        <button type="button" class="btn-cal-nav" id="btnNextMonth"><i class="fa-solid fa-chevron-right"></i></button>
+                                    </div>
+                                    <div class="calendar-grid-weekdays">
+                                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                                    </div>
+                                    <div class="calendar-grid-days" id="calendarGrid">
+                                        <!-- Loaded dynamically -->
+                                    </div>
+                                </div>
+                                <input type="hidden" id="formDate" required>
+                                <small class="form-help text-warning" id="calendarWarn">Select an open, highlighted date grid slot.</small>
+                            </div>
+
+                            <div class="form-actions span-full">
+                                <div></div>
+                                <button type="button" class="btn btn-primary" id="btnGoToStep2">Next: Logistics & Bar <i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BACK OF CARD (Step 2: Logistics & Bar Setup) -->
+                <div class="booking-card-side" id="step2Side">
+                    <div class="booking-card-content">
+                        <div class="step-indicator">
+                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
+                            <span class="step-line active"></span>
+                            <span class="step-num active">2</span>
+                            <span class="step-line"></span>
+                            <span class="step-num">3</span>
+                            <span class="step-line"></span>
+                            <span class="step-num">4</span>
+                        </div>
+                        
+                        <h3 class="form-side-title"><i class="fa-solid fa-box-open gold-text"></i> Step 2: Bar & Logistics</h3>
+                        <p class="form-side-desc">Select counter configurations, add-ons, and location accessibility checklist.</p>
+                        
+                        <div class="booking-form-grid">
+                            <div class="form-group span-full">
+                                <label><i class="fa-solid fa-cube"></i> Bar Counter Configuration</label>
+                                <div class="bar-selector-grid">
+                                    <label class="bar-option-card">
+                                        <input type="radio" name="barTemplate" value="small" checked>
+                                        <div class="option-card-inner">
+                                            <i class="fa-solid fa-box"></i>
+                                            <strong>Compact Bar</strong>
+                                            <small>Standard setups</small>
+                                        </div>
+                                    </label>
+                                    <label class="bar-option-card">
+                                        <input type="radio" name="barTemplate" value="large">
+                                        <div class="option-card-inner">
+                                            <i class="fa-solid fa-table"></i>
+                                            <strong>Banqueting</strong>
+                                            <small>Extended table</small>
+                                        </div>
+                                    </label>
+                                    <label class="bar-option-card">
+                                        <input type="radio" name="barTemplate" value="led">
+                                        <div class="option-card-inner">
+                                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                            <strong>Glow LED Bar</strong>
+                                            <small>+ GHC 1,200</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group span-full">
+                                <label><i class="fa-solid fa-plus-circle"></i> À la carte Add-ons</label>
+                                <div class="addons-selector-grid">
+                                    <label class="addon-checkbox-label">
+                                        <input type="checkbox" id="addonGlassware" value="glassware">
+                                        <span class="addon-info">
+                                            <strong>Premium Glassware Service (+GHC 1,500)</strong>
+                                            <small>Serve signature drinks in custom leaded crystal goblets.</small>
+                                        </span>
+                                    </label>
+                                    <label class="addon-checkbox-label">
+                                        <input type="checkbox" id="addonWorkshop" value="workshop">
+                                        <span class="addon-info">
+                                            <strong>Mixology Workshop (+GHC 2,500)</strong>
+                                            <small>1-hour masterclass for guests to mix their own drinks.</small>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="logisticsFloors"><i class="fa-solid fa-stairs"></i> Floor Level</label>
+                                <input type="number" id="logisticsFloors" min="0" value="0">
+                            </div>
+
+                            <div class="form-group" style="justify-content: flex-end; padding-bottom: 5px;">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="logisticsElevator">
+                                    <span>Elevator Available?</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group span-full">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="logisticsPower" required checked>
+                                    <span>Mandatory: Dedicated 13A socket within 10 meters of setup?</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group span-full">
+                                <label for="logisticsNotes"><i class="fa-solid fa-circle-info"></i> Access/Delivery Details</label>
+                                <input type="text" id="logisticsNotes" placeholder="e.g. Back door ramp access, loading dock code... (Optional)">
+                            </div>
+
+                            <div class="form-actions span-full">
+                                <button type="button" class="btn btn-outline" id="btnBackToStep1"><i class="fa-solid fa-chevron-left"></i> Back</button>
+                                <button type="button" class="btn btn-primary" id="btnGoToStep3">Next: Client Info <i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOP OF CARD (Step 3: Client Details) -->
+                <div class="booking-card-side" id="step3Side">
+                    <div class="booking-card-content">
+                        <div class="step-indicator">
+                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
+                            <span class="step-line active"></span>
+                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
+                            <span class="step-line active"></span>
+                            <span class="step-num active">3</span>
+                            <span class="step-line"></span>
+                            <span class="step-num">4</span>
+                        </div>
+                        
+                        <h3 class="form-side-title"><i class="fa-solid fa-id-card gold-text"></i> Step 3: Contact Info</h3>
+                        <p class="form-side-desc">Tell us who we are mixing for. Details are kept completely secure.</p>
+                        
+                        <form id="contactForm" class="booking-form-grid">
+                            <div class="form-group">
+                                <label for="formName"><i class="fa-solid fa-user"></i> Full Name</label>
+                                <input type="text" id="formName" placeholder="John Doe" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="formEmail"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                                <input type="email" id="formEmail" placeholder="john@example.com" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="formPhone"><i class="fa-solid fa-phone"></i> Phone Number</label>
+                                <input type="tel" id="formPhone" placeholder="e.g. 054 618 3758" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="formInstagram"><i class="fa-brands fa-instagram"></i> Instagram Handle</label>
+                                <input type="text" id="formInstagram" placeholder="@mirage_cocktails">
+                            </div>
+
+                            <div class="form-group span-full">
+                                <label for="formNotes"><i class="fa-solid fa-pen-fancy"></i> Customization Requests / Notes</label>
+                                <textarea id="formNotes" placeholder="Any special themes, preferred ingredients, or setup details... (Optional)" rows="2"></textarea>
+                            </div>
+
+                            <div class="form-actions span-full">
+                                <button type="button" class="btn btn-outline" id="btnBackToStep2"><i class="fa-solid fa-chevron-left"></i> Back</button>
+                                <button type="button" class="btn btn-primary" id="btnGoToStep4">Next: Review Invoice <i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- BOTTOM OF CARD (Step 4: Review Summary & Secure Stripe Payment checkout) -->
+                <!-- Styled as class side-checkout to support 180x-180y flip rotation -->
+                <div class="booking-card-side" id="step4Side">
+                    <div class="booking-card-content">
+                        <div class="step-indicator">
+                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
+                            <span class="step-line active"></span>
+                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
+                            <span class="step-line active"></span>
+                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
+                            <span class="step-line active"></span>
+                            <span class="step-num active">4</span>
+                        </div>
+                        
+                        <h3 class="form-side-title"><i class="fa-solid fa-file-invoice-dollar gold-text"></i> Step 4: Invoice & Payment</h3>
+                        <p class="form-side-desc">Review your package specifications and pay the 70% deposit to lock the date.</p>
+                        
+                        <div class="booking-form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <!-- Invoice review column -->
+                            <div class="review-details-box" style="margin-bottom: 0; padding: 1.1rem; height: 310px; overflow-y: auto;">
+                                <div class="review-grid" style="grid-template-columns: 110px 1fr; gap: 0.5rem 0.2rem; font-size: 0.85rem;">
+                                    <span class="review-label">Client Name:</span>
+                                    <span class="review-val font-semibold" id="revName">-</span>
+
+                                    <span class="review-label">Event Date:</span>
+                                    <span class="review-val font-semibold" id="revDate">-</span>
+
+                                    <span class="review-label">Guests:</span>
+                                    <span class="review-val" id="revGuests">-</span>
+
+                                    <span class="review-label">Duration:</span>
+                                    <span class="review-val" id="revDuration">-</span>
+
+                                    <span class="review-label">Bar Template:</span>
+                                    <span class="review-val" id="revBarTemplate">-</span>
+
+                                    <span class="review-label">Transport:</span>
+                                    <span class="review-val" id="revTransport">-</span>
+
+                                    <span class="review-label span-full divider"></span>
+
+                                    <span class="review-label">Total Cost:</span>
+                                    <span class="review-val font-semibold" id="revTotal">-</span>
+
+                                    <span class="review-label gold-text">70% Deposit:</span>
+                                    <span class="review-val font-bold gold-text" id="revDeposit">-</span>
+
+                                    <span class="review-label">30% Balance:</span>
+                                    <span class="review-val" id="revBalance">-</span>
+
+                                    <span class="review-label warning-date-lbl">Balance Due:</span>
+                                    <span class="review-val text-warning font-semibold" id="revDueDate">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Secure Paystack Checkout Gateway -->
+                            <div class="review-details-box" style="margin-bottom: 0; padding: 1.1rem; text-align: left; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="font-size:0.95rem; color: var(--gold-light); margin-bottom: 0.8rem;"><i class="fa-solid fa-shield-halved"></i> Secure Paystack Checkout</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
+                                        You will pay your deposit securely via **Paystack**. We accept:
+                                    </p>
+                                    <ul style="list-style: none; padding: 0; margin: 0 0 1.2rem 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+                                        <li><i class="fa-solid fa-mobile-screen-button" style="color: var(--gold); margin-right: 6px;"></i> Mobile Money (MTN, Telecel, AT)</li>
+                                        <li><i class="fa-solid fa-credit-card" style="color: var(--gold); margin-right: 6px;"></i> Credit/Debit Cards (Visa, Mastercard)</li>
+                                        <li><i class="fa-solid fa-building-columns" style="color: var(--gold); margin-right: 6px;"></i> Secure Bank Transfers</li>
+                                    </ul>
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 0.6rem; font-size: 0.78rem; color: var(--text-muted);">
+                                        <i class="fa-solid fa-lock" style="font-size: 0.95rem; color: var(--gold);"></i>
+                                        <span>PCI-DSS Secure Checkout Connection</span>
+                                    </div>
+                                </div>
+
+                                <div class="policy-checkbox-area" style="margin-bottom: 0; font-size: 0.75rem; gap: 6px; line-height: 1.3;">
+                                    <input type="checkbox" id="policyAgreement" required style="width: 14px; height: 14px; margin-top: 1px;">
+                                    <label for="policyAgreement">
+                                        I authorize booking calculations and the 70% non-refundable deposit.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-actions span-full" style="margin-top: 0.8rem;">
+                                <button type="button" class="btn btn-outline" id="btnBackToStep3"><i class="fa-solid fa-chevron-left"></i> Back</button>
+                                <button type="button" class="btn btn-submit-order btn-primary" id="btnSubmitBooking" style="padding: 0.65rem 1.5rem; font-size:0.95rem;">
+                                    Secure Deposit Payment & Book <i class="fa-solid fa-lock" style="margin-left:6px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Glassmorphic Overlay Modal (Hidden by default) -->
+        <div class="modal-overlay" id="successModal">
+            <div class="success-card-glass">
+                <div class="success-icon-container">
+                    <i class="fa-solid fa-champagne-glasses"></i>
+                </div>
+                <h2>Booking Confirmed & Secured!</h2>
+                <p class="booking-id-tag">ID: <span id="successBookingId">MC-2026-X</span></p>
+                <div class="divider"></div>
+                <div class="success-breakdown">
+                    <p>Thank you, <strong id="successName">Name</strong>. Your mobile bar reservation date is locked and a transaction receipt has been simulated.</p>
+                    <p class="deposit-callout">Deposit Paid: <strong class="gold-text" id="successDeposit">GHC 0</strong> (70%). A 5-days reminder and event confirmation notifications have been written to the logs.</p>
+                    <p class="balance-callout">Remaining 30% Balance (<strong id="successBalance">GHC 0</strong>) is due by <strong id="successDueDate">Date</strong> (exactly 2 weeks prior to event date).</p>
+                </div>
+                <button type="button" class="btn btn-primary" id="btnCloseModal">Done & Back to Home</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Transition Strip -->
+    <div class="section-transition-strip scroll-reveal"></div>
+
+    <!-- Bookings & Service Terms -->
+    <section class="terms-section" id="terms">
+        <div class="terms-container">
+            <div class="terms-image-side scroll-reveal reveal-left">
+                <div class="success-card-glass" style="max-width: 100%; width: 100%; text-align: left; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin: 0; border: 1px solid var(--glass-border);">
+                    <div class="success-icon-container" style="margin: 0 0 1.5rem 0; width: 55px; height: 55px; font-size: 1.6rem;">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h3 style="font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--gold-light); font-family: var(--font-heading);">Booking Summary</h3>
+                    <div style="width: 50px; height: 2px; background: var(--gold); margin-bottom: 1.5rem;"></div>
+                    
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 1.2rem; font-size: 0.95rem; color: var(--text-muted); padding: 0;">
+                        <li style="display: flex; gap: 12px; align-items: flex-start;">
+                            <i class="fa-solid fa-circle-check" style="color: var(--gold); margin-top: 4px; flex-shrink: 0;"></i>
+                            <div>
+                                <strong style="color: var(--text-light);">70% Deposit Required</strong>
+                                <p style="font-size: 0.85rem; margin-top: 2px; line-height: 1.4;">Secures date booking immediately. Non-refundable.</p>
+                            </div>
+                        </li>
+                        <li style="display: flex; gap: 12px; align-items: flex-start;">
+                            <i class="fa-solid fa-circle-check" style="color: var(--gold); margin-top: 4px; flex-shrink: 0;"></i>
+                            <div>
+                                <strong style="color: var(--text-light);">30% Final Balance</strong>
+                                <p style="font-size: 0.85rem; margin-top: 2px; line-height: 1.4;">Due strictly 2 weeks before event date.</p>
+                            </div>
+                        </li>
+                        <li style="display: flex; gap: 12px; align-items: flex-start;">
+                            <i class="fa-solid fa-circle-check" style="color: var(--gold); margin-top: 4px; flex-shrink: 0;"></i>
+                            <div>
+                                <strong style="color: var(--text-light);">Custom Pricing</strong>
+                                <p style="font-size: 0.85rem; margin-top: 2px; line-height: 1.4;">Applies to custom menus or guest counts over 200.</p>
+                            </div>
+                        </li>
+                        <li style="display: flex; gap: 12px; align-items: flex-start;">
+                            <i class="fa-solid fa-circle-check" style="color: var(--gold); margin-top: 4px; flex-shrink: 0;"></i>
+                            <div>
+                                <strong style="color: var(--text-light);">Logistics Deadline</strong>
+                                <p style="font-size: 0.85rem; margin-top: 2px; line-height: 1.4;">Finalized upon receipt of remaining balance.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="terms-content-side scroll-reveal reveal-right delay-2">
+                <div class="badge"><i class="fa-solid fa-handshake"></i> Professional Standards</div>
+                <h2>Bookings & Service Terms</h2>
+                <div class="gold-divider-left"></div>
+                
+                <div class="term-item">
+                    <div class="term-number">70%</div>
+                    <div class="term-text">
+                        <h4>Non-Refundable Booking Deposit</h4>
+                        <p>Kindly note that bookings are only confirmed upon receipt of a 70% non-refundable deposit. This secures your date and enables the acquisition of ingredients and spirits.</p>
+                    </div>
+                </div>
+
+                <div class="term-item">
+                    <div class="term-number">30%</div>
+                    <div class="term-text">
+                        <h4>Remaining Balance Payment</h4>
+                        <p>The remaining 30% balance is strictly <strong>due two weeks prior</strong> to the event start time to allow for the professional procurement of premium ingredients.</p>
+                    </div>
+                </div>
+
+                <div class="term-item">
+                    <div class="term-number"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <div class="term-text">
+                        <h4>Logistics & Customization Policy</h4>
+                        <p>Standardized packages are subject to customization. Bespoke services and events exceeding 200 guests will require custom pricing. All logistics are finalized upon balance payment; non-payment results in an event cancellation.</p>
+                    </div>
+                </div>
+
+                <div class="contact-card-glass">
+                    <h4>Ready to converse directly?</h4>
+                    <div class="contact-details">
+                        <a href="tel:0546183758" class="contact-link"><i class="fa-solid fa-phone"></i> 054 618 3758</a>
+                        <a href="https://instagram.com/mirage_cocktails" target="_blank" class="contact-link"><i class="fa-brands fa-instagram"></i> @mirage_cocktails</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="assets/logo.jpg" alt="Mirage Logo" class="footer-logo">
+                <div>
+                    <h3>MIRAGE COCKTAILS</h3>
+                    <p>Creating Memories Worth Sharing</p>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Navigation</h4>
+                <a href="#about">About Us</a>
+                <a href="#packages">Packages</a>
+                <a href="#booking">Book Mobile Bar</a>
+                <a href="#terms">Terms of Service</a>
+            </div>
+            <div class="footer-socials">
+                <h4>Connect</h4>
+                <p>Phone: 054 618 3758</p>
+                <p>Instagram: @mirage_cocktails</p>
+                <div class="social-icons">
+                    <a href="https://instagram.com/mirage_cocktails" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="tel:0546183758"><i class="fa-solid fa-phone"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mirage Cocktails. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Paystack Checkout Integration -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <!-- Main Client Script -->
+    <script src="js/main.js"></script>
+</body>
+</html>
