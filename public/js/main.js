@@ -541,18 +541,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ----------------------------------------------------------------------
-    // 7. Secure Deposit Payment Submit (Stripe Checkout API Mock)
-    // ----------------------------------------------------------------------
-    const successModal = document.getElementById('successModal');
-    const successBookingId = document.getElementById('successBookingId');
-    const successName = document.getElementById('successName');
-    const successDeposit = document.getElementById('successDeposit');
-    const successBalance = document.getElementById('successBalance');
-    const successDueDate = document.getElementById('successDueDate');
-    const btnCloseModal = document.getElementById('btnCloseModal');
-    const policyAgreement = document.getElementById('policyAgreement');
-
     // 7. Secure Deposit Payment Submit (Paystack Checkout Integration)
     // ----------------------------------------------------------------------
     const successModal = document.getElementById('successModal');
@@ -563,6 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const successDueDate = document.getElementById('successDueDate');
     const btnCloseModal = document.getElementById('btnCloseModal');
     const policyAgreement = document.getElementById('policyAgreement');
+
 
     if (btnSubmitBooking) {
         btnSubmitBooking.addEventListener('click', async () => {
