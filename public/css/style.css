@@ -51,22 +51,6 @@ body {
     min-height: 100vh;
 }
 
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('../assets/premium_cocktail_bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.12; /* extremely subtle, elegant texture */
-    z-index: -3; /* behind the glows */
-    pointer-events: none;
-}
-
 /* Ambient Sparkle and Blur Glows */
 .ambient-glow {
     position: absolute;
