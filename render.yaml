@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: mirage-cocktails
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PAYSTACK_SUBACCOUNT
+        value: ACCT_8pst4xn4lf6rvoy
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: ADMIN_USER
+        sync: false
+      - key: ADMIN_PASS
+        sync: false
+      - key: OTP_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
