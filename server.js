@@ -334,10 +334,11 @@ const PACKAGES = {
 // PUBLIC APIS
 // ----------------------------------------------------------------------
 
-// Get public config (exposes Paystack Public Key)
+// Get public config (exposes Paystack Public Key and Subaccount)
 app.get('/api/config', (req, res) => {
   res.json({
-    paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY || ''
+    paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY || '',
+    paystackSubaccount: process.env.PAYSTACK_SUBACCOUNT || ''
   });
 });
 

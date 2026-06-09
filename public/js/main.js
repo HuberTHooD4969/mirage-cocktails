@@ -590,12 +590,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 notes: formNotes.value.trim()
             };
 
-            // Fetch Paystack public key from server configuration
+            // Fetch Paystack configurations from server
             let paystackPublicKey = '';
+            let paystackSubaccount = '';
             try {
                 const configRes = await fetch('/api/config');
                 const configData = await configRes.json();
                 paystackPublicKey = configData.paystackPublicKey;
+                paystackSubaccount = configData.paystackSubaccount;
             } catch (err) {
                 console.error('Failed to load Paystack config:', err);
             }
@@ -636,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 btnSubmitBooking.innerHTML = '<i class="fa-solid fa-credit-card"></i> Awaiting Payment...';
 
-                const handler = PaystackPop.setup({
+                const paystackOptions = {
                     key: paystackPublicKey,
                     email: b.email,
                     amount: Math.round(Number(b.deposit) * 100), // convert GHS to pesewas (minor units)
@@ -679,7 +681,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         btnSubmitBooking.disabled = false;
                         btnSubmitBooking.innerHTML = 'Secure Deposit Payment & Book <i class="fa-solid fa-lock" style="margin-left:6px;"></i>';
                     }
-                });
+                };
+
+                // Add subaccount routing if configured on server
+                if (paystackSubaccount) {
+                    paystackOptions.subaccount = paystackSubaccount;
+                }
+
+                const handler = PaystackPop.setup(paystackOptions);
 
                 handler.openIframe();
 
