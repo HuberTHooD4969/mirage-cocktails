@@ -728,11 +728,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logisticsFloors.value = 0;
             logisticsElevator.checked = false;
             logisticsNotes.value = '';
-            
-            payCardName.value = '';
-            payCardNum.value = '';
-            payCardExpiry.value = '';
-            payCardCvv.value = '';
             policyAgreement.checked = false;
 
             calendarWarn.textContent = 'Select an open, highlighted date grid slot.';
