@@ -426,24 +426,17 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
   let deposit = totalPrice * 0.70;
   let balance = totalPrice * 0.30;
 
-  let formattedTotal = totalPrice;
-  let formattedDeposit = deposit;
-  let formattedBalance = balance;
 
-  if (guestCount > 200) {
-    isCustom = true;
-    formattedTotal = 'Custom Quote Required';
-    formattedDeposit = 'Pending Quote';
-    formattedBalance = 'Pending Quote';
-  }
 
-  // Calculate remaining balance due date (exactly 14 days before event date)
-  const eventDate = new Date(date);
-  const balanceDueDate = new Date(eventDate.getTime() - (14 * 24 * 60 * 60 * 1000));
-  const formattedBalanceDueDate = balanceDueDate.toISOString().split('T')[0];
+  // Dates calculations
+  const eventDateObj = new Date(date);
+  const balanceDueObj = new Date(eventDateObj.getTime() - (14 * 24 * 60 * 60 * 1000));
+  const formattedBalanceDueDate = balanceDueObj.toISOString().split('T')[0];
 
-  // Generate unique booking ID
-  const uniqueId = `MC-${date.replace(/-/g, '')}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+  // Create unique ID
+  const dateString = date.replace(/-/g, '');
+  const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const uniqueId = `MC-${dateString}-${randomSuffix}`;
 
   const newBooking = {
     id: uniqueId,
@@ -462,9 +455,9 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
     addons: [],
     logistics: {},
     mileage: {},
-    totalPrice: formattedTotal,
-    deposit: formattedDeposit,
-    balance: formattedBalance,
+    totalPrice: totalPrice,
+    deposit: deposit,
+    balance: balance,
     balanceDueDate: formattedBalanceDueDate,
     notes: notes || '',
     status: 'Pending',
