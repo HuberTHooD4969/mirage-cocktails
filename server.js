@@ -17,8 +17,8 @@ const NOTIFICATION_LOG = path.join(LOGS_DIR, 'notifications.log');
 
 // Load secrets from environment variables (fallback to defaults for local dev)
 const SERVER_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_PASS = process.env.ADMIN_PASS || 'mirage2026';
+const ADMIN_USER = process.env.ADMIN_USER || 'MIRAGE';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'MIRAGE26';
 const OTP_SECRET = process.env.OTP_SECRET || 'mirage-secure-2fa-secret-2285';
 
 // Security Headers Middleware
