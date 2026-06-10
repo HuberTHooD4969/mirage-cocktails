@@ -121,26 +121,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------------------------
-    // 2. Tab Navigation controls
+    // 2. Sidebar Navigation controls
     // ----------------------------------------------------------------------
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    const navBookings = document.getElementById('navBookings');
+    const navStock = document.getElementById('navStock');
+    const viewBookings = document.getElementById('viewBookings');
+    const viewStock = document.getElementById('viewStock');
+    const currentViewTitle = document.getElementById('currentViewTitle');
 
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabBtns.forEach(b => b.classList.replace('btn-primary', 'btn-outline'));
-            btn.classList.replace('btn-outline', 'btn-primary');
-
-            const tabId = btn.getAttribute('data-tab');
-            tabContents.forEach(c => c.style.display = 'none');
-            
-            if (tabId === 'bookings') document.getElementById('tabBookings').style.display = 'block';
-            if (tabId === 'stock') {
-                document.getElementById('tabStock').style.display = 'block';
-                calculateStockRequirements(allBookings);
-            }
+    if (navBookings && navStock) {
+        navBookings.addEventListener('click', () => {
+            navBookings.classList.add('active');
+            navStock.classList.remove('active');
+            viewBookings.style.display = 'block';
+            viewStock.style.display = 'none';
+            currentViewTitle.textContent = 'Bookings Manager';
         });
-    });
+
+        navStock.addEventListener('click', () => {
+            navStock.classList.add('active');
+            navBookings.classList.remove('active');
+            viewStock.style.display = 'block';
+            viewBookings.style.display = 'none';
+            currentViewTitle.textContent = 'Stock Planner';
+            calculateStockRequirements(allBookings);
+        });
+    }
 
 
     // ----------------------------------------------------------------------
@@ -167,56 +173,44 @@ document.addEventListener('DOMContentLoaded', () => {
             const eventDate = new Date(b.date).toLocaleDateString(undefined, {
                 month: 'short',
                 day: 'numeric',
-                year: 'numeric',
-                weekday: 'short'
+                year: 'numeric'
             });
 
             // Format pricing
             let totalVal = typeof b.totalPrice === 'number' ? `GHC ${b.totalPrice.toLocaleString()}` : b.totalPrice;
             let depositVal = typeof b.deposit === 'number' ? `GHC ${b.deposit.toLocaleString()}` : b.deposit;
-            let balanceVal = typeof b.balance === 'number' ? `GHC ${b.balance.toLocaleString()}` : b.balance;
 
             // Status badges
-            let badgeClass = 'pending';
-            if (b.status === 'Deposit Paid') badgeClass = 'deposit-paid';
-            if (b.status === 'Fully Paid') badgeClass = 'fully-paid';
-            if (b.status === 'Refunded') badgeClass = 'fully-paid'; // reuse color theme
-            if (b.status === 'Cancelled') badgeClass = 'cancelled';
-
-            // Add-ons list
-            const addonsNames = b.addons && b.addons.length > 0 
-                ? b.addons.map(a => a.name.split(' ')[0]).join(', ') 
-                : 'None';
+            let badgeClass = 'badge-warning';
+            let iconClass = 'fa-clock';
+            if (b.status === 'Deposit Paid') { badgeClass = 'badge-success'; iconClass = 'fa-check-circle'; }
+            if (b.status === 'Fully Paid') { badgeClass = 'badge-success'; iconClass = 'fa-check-double'; }
+            if (b.status === 'Refunded') { badgeClass = 'badge-warning'; iconClass = 'fa-rotate-left'; }
+            if (b.status === 'Cancelled') { badgeClass = 'badge-danger'; iconClass = 'fa-xmark'; }
 
             tr.innerHTML = `
-                <td class="font-bold gold-text" style="font-size:0.75rem;">${b.id}</td>
-                <td class="font-semibold" style="font-size:0.85rem;">${eventDate}</td>
                 <td>
-                    <div class="font-semibold">${b.name}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-phone"></i> ${b.phone}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-envelope"></i> ${b.email}</div>
-                </td>
-                <td><span class="badge" style="margin:0; padding:2px 8px; font-size:0.8rem;">${b.guests}</span></td>
-                <td>
-                    <div class="font-semibold" style="font-size:0.85rem;">${b.packageName}</div>
-                    <div style="font-size:0.75rem; color: var(--text-muted);"><i class="fa-solid fa-clock"></i> ${b.durationHours || 5} Hours Service</div>
-                    <div style="font-size:0.75rem; color: var(--gold-light);"><i class="fa-solid fa-cube"></i> ${b.barLabel || 'Compact'}</div>
-                </td>
-                <td style="font-size:0.8rem; color: var(--text-muted);">${addonsNames}</td>
-                <td>
-                    <div class="font-semibold">${totalVal}</div>
-                    <div style="font-size:0.75rem; color: var(--gold);">${depositVal}</div>
-                    <div style="font-size:0.75rem; color: var(--text-muted);">${balanceVal}</div>
-                </td>
-                <td style="font-size: 0.8rem; font-weight: 500;">${b.balanceDueDate}</td>
-                <td>
-                    <span class="status-badge ${badgeClass}">${b.status}</span>
+                    <div style="font-weight:600; color:var(--admin-gold);">${b.id}</div>
+                    <div style="font-size:0.8rem; color:var(--admin-text-muted);"><i class="fa-regular fa-calendar"></i> ${eventDate}</div>
                 </td>
                 <td>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-outline btn-roadmap" data-booking-id="${b.id}" style="padding:4px 8px; font-size:0.75rem;"><i class="fa-solid fa-route"></i> Roadmap</button>
-                        <button class="btn btn-primary btn-edit-row" data-booking-id="${b.id}" style="padding:4px 8px; font-size:0.75rem;"><i class="fa-solid fa-edit"></i> Edit</button>
-                    </div>
+                    <div style="font-weight:600;">${b.name}</div>
+                    <div style="font-size:0.8rem; color:var(--admin-text-muted);">${b.phone}</div>
+                </td>
+                <td>
+                    <div style="font-weight:600;">${b.packageName} <span class="badge" style="background:#2d3340; font-size:0.7rem; padding:2px 6px;">${b.guests} Guests</span></div>
+                    <div style="font-size:0.8rem; color:var(--admin-text-muted);">${b.durationHours || 5} Hours</div>
+                </td>
+                <td>
+                    <div style="font-weight:600;">${totalVal}</div>
+                    <div style="font-size:0.8rem; color:var(--admin-text-muted);">Dep: ${depositVal}</div>
+                </td>
+                <td>
+                    <span class="badge ${badgeClass}"><i class="fa-solid ${iconClass}"></i> ${b.status}</span>
+                </td>
+                <td style="text-align:right;">
+                    <button class="btn btn-outline btn-roadmap" data-booking-id="${b.id}" style="padding:4px 8px; font-size:0.8rem; margin-right:4px;" title="Print Roadmap"><i class="fa-solid fa-print"></i></button>
+                    <button class="btn btn-outline btn-edit-row" data-booking-id="${b.id}" style="padding:4px 8px; font-size:0.8rem;" title="Edit Booking"><i class="fa-solid fa-pen"></i></button>
                 </td>
             `;
 
@@ -289,58 +283,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const cupsCount = Math.ceil(totalDrinks * 1.1);
 
         stockPlannerGrid.innerHTML = `
-            <div class="package-card" style="padding:1.5rem; border: 1px solid var(--glass-border); text-align: left;">
-                <div class="success-icon-container" style="margin: 0 0 1rem 0; width:45px; height:45px; font-size:1.3rem; background: var(--gold); color:#000;">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <h4 style="color:var(--text-light); font-size: 0.95rem;">Total Attendance</h4>
-                <div class="gold-text font-bold" style="font-size: 2.2rem; font-family:var(--font-heading); margin-top:0.4rem;">${totalGuests.toLocaleString()}</div>
-                <small style="color:var(--text-muted);">Across all events</small>
+            <div class="stock-card">
+                <h4>Total Attendance</h4>
+                <p>${totalGuests.toLocaleString()}</p>
+                <small class="text-muted">Across active events</small>
             </div>
             
-            <div class="package-card" style="padding:1.5rem; border: 1px solid var(--glass-border); text-align: left;">
-                <div class="success-icon-container" style="margin: 0 0 1rem 0; width:45px; height:45px; font-size:1.3rem; background: var(--gold); color:#000;">
-                    <i class="fa-solid fa-wine-bottle"></i>
-                </div>
-                <h4 style="color:var(--text-light); font-size: 0.95rem;">Liquor / Spirits</h4>
-                <div class="gold-text font-bold" style="font-size: 2.2rem; font-family:var(--font-heading); margin-top:0.4rem;">${spiritBottles} <span style="font-size:1rem; font-weight:400; font-family:var(--font-body);">Btls</span></div>
-                <small style="color:var(--text-muted);">${spiritLiters.toFixed(1)} L needed (45ml/serv)</small>
+            <div class="stock-card">
+                <h4>Liquor Bottles</h4>
+                <p>${spiritBottles}</p>
+                <small class="text-muted">750ml bottles needed</small>
             </div>
 
-            <div class="package-card" style="padding:1.5rem; border: 1px solid var(--glass-border); text-align: left;">
-                <div class="success-icon-container" style="margin: 0 0 1rem 0; width:45px; height:45px; font-size:1.3rem; background: var(--gold); color:#000;">
-                    <i class="fa-solid fa-whiskey-glass"></i>
-                </div>
-                <h4 style="color:var(--text-light); font-size: 0.95rem;">Mixers & Juices</h4>
-                <div class="gold-text font-bold" style="font-size: 2.2rem; font-family:var(--font-heading); margin-top:0.4rem;">${mixerLiters} <span style="font-size:1rem; font-weight:400; font-family:var(--font-body);">Ltrs</span></div>
-                <small style="color:var(--text-muted);">Fruit purees & juices (100ml/serv)</small>
+            <div class="stock-card">
+                <h4>Mixers & Juices</h4>
+                <p>${mixerLiters}L</p>
+                <small class="text-muted">Liters of puree/juice</small>
             </div>
 
-            <div class="package-card" style="padding:1.5rem; border: 1px solid var(--glass-border); text-align: left;">
-                <div class="success-icon-container" style="margin: 0 0 1rem 0; width:45px; height:45px; font-size:1.3rem; background: var(--gold); color:#000;">
-                    <i class="fa-solid fa-cubes"></i>
-                </div>
-                <h4 style="color:var(--text-light); font-size: 0.95rem;">Ice Requirements</h4>
-                <div class="gold-text font-bold" style="font-size: 2.2rem; font-family:var(--font-heading); margin-top:0.4rem;">${iceKg} <span style="font-size:1rem; font-weight:400; font-family:var(--font-body);">Kgs</span></div>
-                <small style="color:var(--text-muted);">0.5kg cooling ice per guest</small>
+            <div class="stock-card">
+                <h4>Ice Kgs</h4>
+                <p>${iceKg}kg</p>
+                <small class="text-muted">Cooling ice volume</small>
             </div>
 
-            <div class="package-card" style="padding:1.5rem; border: 1px solid var(--glass-border); text-align: left; grid-column: span 2;">
-                <div class="success-icon-container" style="margin: 0 0 1rem 0; width:45px; height:45px; font-size:1.3rem; background: var(--gold); color:#000;">
-                    <i class="fa-solid fa-martini-glass-citrus"></i>
-                </div>
-                <h4 style="color:var(--text-light); font-size: 0.95rem;">Estimated Total Servings</h4>
-                <div class="gold-text font-bold" style="font-size: 2.2rem; font-family:var(--font-heading); margin-top:0.4rem;">${totalDrinks.toLocaleString()} <span style="font-size:1rem; font-weight:400; font-family:var(--font-body);">Serves</span></div>
-                <small style="color:var(--text-muted);">Adjusted for packages & service hours</small>
+            <div class="stock-card">
+                <h4>Total Servings</h4>
+                <p>${totalDrinks.toLocaleString()}</p>
+                <small class="text-muted">Estimated drinks poured</small>
             </div>
 
-            <div class="package-card" style="padding:1.5rem; border: 1px solid var(--glass-border); text-align: left; grid-column: span 2;">
-                <div class="success-icon-container" style="margin: 0 0 1rem 0; width:45px; height:45px; font-size:1.3rem; background: var(--gold); color:#000;">
-                    <i class="fa-solid fa-glass-water"></i>
-                </div>
-                <h4 style="color:var(--text-light); font-size: 0.95rem;">Branded Cups & Garnishes</h4>
-                <div class="gold-text font-bold" style="font-size: 2.2rem; font-family:var(--font-heading); margin-top:0.4rem;">${cupsCount.toLocaleString()} <span style="font-size:1rem; font-weight:400; font-family:var(--font-body);">Units</span></div>
-                <small style="color:var(--text-muted);">Includes 10% spill & setup buffer</small>
+            <div class="stock-card">
+                <h4>Branded Cups</h4>
+                <p>${cupsCount.toLocaleString()}</p>
+                <small class="text-muted">Includes 10% buffer</small>
             </div>
         `;
     }
@@ -588,6 +564,17 @@ document.addEventListener('DOMContentLoaded', () => {
         statsTotal.textContent = allBookings.length;
         const pendingCount = allBookings.filter(b => b.status === 'Pending').length;
         statsPending.textContent = pendingCount;
+        
+        let estRevenue = 0;
+        allBookings.forEach(b => {
+            if (b.status !== 'Cancelled' && b.status !== 'Refunded') {
+                estRevenue += (typeof b.totalPrice === 'number' ? b.totalPrice : 0);
+            }
+        });
+        const statsRevenue = document.getElementById('statsRevenue');
+        if (statsRevenue) {
+            statsRevenue.textContent = `GHC ${estRevenue.toLocaleString()}`;
+        }
     }
 
     if (adminSearch) adminSearch.addEventListener('input', applyFilterAndSearch);
