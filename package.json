@@ -20,6 +20,7 @@
     "dotenv": "^17.4.2",
     "express": "^4.21.2",
     "express-rate-limit": "^8.5.2",
+    "nodemailer": "^8.0.10",
     "sqlite3": "^6.0.1"
   }
 }

@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const sqlite3 = require('sqlite3').verbose();
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,6 +48,126 @@ const bookingLimiter = rateLimit({
   message: { error: 'Too many booking requests. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
+});
+
+// ----------------------------------------------------------------------
+// NOTIFICATION SERVICES (Email + SMS)
+// ----------------------------------------------------------------------
+
+// Nodemailer transporter (lazy-init)
+let mailTransporter = null;
+const getMailTransporter = () => {
+  if (mailTransporter) return mailTransporter;
+  if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+    mailTransporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    });
+  }
+  return mailTransporter;
+};
+
+const sendEmail = async (to, subject, html) => {
+  const transporter = getMailTransporter();
+  if (!transporter) return false;
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || '"Mirage Cocktails" <noreply@miragecocktails.com>',
+      to, subject, html
+    });
+    return true;
+  } catch (err) {
+    console.error('[Email Error]', err.message);
+    return false;
+  }
+};
+
+const sendSMS = async (to, message) => {
+  const apiKey = process.env.SMS_API_KEY;
+  const apiUrl = process.env.SMS_API_URL;
+  const senderId = process.env.SMS_SENDER_ID || 'Mirage';
+  if (!apiKey || !apiUrl) return false;
+  try {
+    const payload = { apiKey, senderId, to, message };
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return response.ok;
+  } catch (err) {
+    console.error('[SMS Error]', err.message);
+    return false;
+  }
+};
+
+const notify = async (bookingId, type, recipient, message) => {
+  const logEntry = `[${new Date().toISOString()}] [Booking ID: ${bookingId}] [Type: ${type}] [Recipient: ${recipient}]\nMessage: ${message}\n----------------------------------------------------------------------\n`;
+  try {
+    fs.appendFileSync(NOTIFICATION_LOG, logEntry, 'utf8');
+  } catch (err) {
+    console.error('Error writing to notification log:', err);
+  }
+  if (type.includes('Email') || type === 'Confirmation Receipt' || type === 'Deposit Confirmation' || type === 'Status Update Log' || type === 'Status Action Alert') {
+    sendEmail(recipient, `Mirage Cocktails - ${type}`, message.replace(/\n/g, '<br>'));
+  }
+  if (type.includes('SMS')) {
+    sendSMS(recipient, message);
+  }
+};
+
+// ----------------------------------------------------------------------
+// PAYSTACK WEBHOOK
+// ----------------------------------------------------------------------
+
+app.post('/webhook/paystack', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const signature = req.headers['x-paystack-signature'];
+    const secret = process.env.PAYSTACK_SECRET_KEY;
+    if (!secret) return res.status(500).send('Webhook not configured');
+
+    const hash = crypto.createHmac('sha512', secret).update(req.body).digest('hex');
+    if (hash !== signature) return res.status(401).send('Invalid signature');
+
+    const event = JSON.parse(req.body.toString());
+    console.log(`[Paystack Webhook] Received: ${event.event}`);
+
+    if (event.event === 'charge.success') {
+      const data = event.data;
+      const reference = data.reference;
+      const bookingId = reference.split('_')[0];
+      const amountGHS = data.amount / 100;
+      const currency = data.currency;
+
+      const booking = await getBookingById(bookingId);
+      if (!booking) return res.status(404).send('Booking not found');
+
+      if (currency !== 'GHS') return res.sendStatus(200);
+
+      if (booking.status === 'Pending') {
+        const depositAmount = typeof booking.deposit === 'number' ? booking.deposit : 0;
+        if (Math.abs(amountGHS - depositAmount) <= 1) {
+          await updateBookingStatus(bookingId, 'Deposit Paid', reference);
+          const msg = `Payment confirmed! Your deposit of GHS ${depositAmount.toLocaleString()} for booking ${bookingId} has been received.`;
+          await notify(bookingId, 'Deposit Confirmation', booking.email, msg);
+        }
+      } else if (booking.status === 'Deposit Paid') {
+        const balanceAmount = typeof booking.balance === 'number' ? booking.balance : 0;
+        if (Math.abs(amountGHS - balanceAmount) <= 1) {
+          await updateBookingStatus(bookingId, 'Fully Paid', reference);
+          const msg = `Payment received! Your final balance of GHS ${balanceAmount.toLocaleString()} has been paid. Booking ${bookingId} is now fully paid.`;
+          await notify(bookingId, 'Balance Confirmation', booking.email, msg);
+        }
+      }
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('[Paystack Webhook Error]', err);
+    res.sendStatus(500);
+  }
 });
 
 // Middleware
@@ -257,14 +378,9 @@ const deleteBooking = (id) => {
   });
 };
 
-// Helper to log notifications (Simulating Email/SMS)
+// Legacy logNotification wrapper (keeps existing callers working)
 const logNotification = (bookingId, type, recipient, message) => {
-  const logEntry = `[${new Date().toISOString()}] [Booking ID: ${bookingId}] [Type: ${type}] [Recipient: ${recipient}]\nMessage: ${message}\n----------------------------------------------------------------------\n`;
-  try {
-    fs.appendFileSync(NOTIFICATION_LOG, logEntry, 'utf8');
-  } catch (err) {
-    console.error('Error writing to notification log:', err);
-  }
+  notify(bookingId, type, recipient, message);
 };
 
 // 2FA Rolling Code Generator (changes every 30 seconds)
