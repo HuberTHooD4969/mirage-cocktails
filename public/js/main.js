@@ -229,6 +229,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize calendar
     fetchAvailability();
 
+    // Pre-fetch Paystack config once at load for faster checkout
+    let paystackPublicKey = '';
+    let paystackSubaccount = '';
+    (async () => {
+        try {
+            const configRes = await fetch('/api/config');
+            const configData = await configRes.json();
+            paystackPublicKey = configData.paystackPublicKey;
+            paystackSubaccount = configData.paystackSubaccount;
+        } catch (err) {
+            console.error('Failed to pre-load Paystack config:', err);
+        }
+    })();
+
 
     // ----------------------------------------------------------------------
     // 5. Booking Form Cost Configurator & Calculations
@@ -481,18 +495,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 packageType: formPackage.value,
                 notes: formNotes.value.trim()
             };
-
-            // Fetch Paystack configurations from server
-            let paystackPublicKey = '';
-            let paystackSubaccount = '';
-            try {
-                const configRes = await fetch('/api/config');
-                const configData = await configRes.json();
-                paystackPublicKey = configData.paystackPublicKey;
-                paystackSubaccount = configData.paystackSubaccount;
-            } catch (err) {
-                console.error('Failed to load Paystack config:', err);
-            }
 
             try {
                 // 1. Save booking as Pending on server

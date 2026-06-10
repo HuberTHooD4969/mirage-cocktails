@@ -467,13 +467,13 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
   const success = await insertBooking(newBooking);
 
   if (success) {
-    // Send Confirmation Alerts Simulation
-    const confirmMessage = `Hello ${name}, your booking request for Mirage Cocktails mobile bar services is received. Booking ID: ${uniqueId}. To secure your date (${date}), please pay the 70% deposit of GHC ${typeof formattedDeposit === 'number' ? formattedDeposit.toLocaleString() : 'Pending Quote'}. Thank you!`;
+    const formattedDeposit = typeof deposit === 'number' ? deposit.toLocaleString() : 'Pending Quote';
+    const formattedBalance = typeof balance === 'number' ? balance.toLocaleString() : 'Pending Quote';
+    const confirmMessage = `Hello ${name}, your booking request for Mirage Cocktails mobile bar services is received. Booking ID: ${uniqueId}. To secure your date (${date}), please pay the 70% deposit of GHC ${formattedDeposit}. Thank you!`;
     logNotification(uniqueId, 'Confirmation Receipt (Email/SMS)', email, confirmMessage);
 
-    // Send 5-Days Reminder Simulation
-    const reminderDate = new Date(eventDate.getTime() - (5 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
-    const reminderMessage = `Reminder: Hello ${name}, your event date of ${date} with Mirage Cocktails is in 5 days. Ensure logistics are confirmed. Outstanding 30% balance: GHC ${typeof formattedBalance === 'number' ? formattedBalance.toLocaleString() : 'Pending Quote'}.`;
+    const reminderDate = new Date(eventDateObj.getTime() - (5 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
+    const reminderMessage = `Reminder: Hello ${name}, your event date of ${date} with Mirage Cocktails is in 5 days. Ensure logistics are confirmed. Outstanding 30% balance: GHC ${formattedBalance}.`;
     logNotification(uniqueId, '5-Days Event Alert (Scheduled for ' + reminderDate + ')', email, reminderMessage);
 
     return res.status(201).json({
