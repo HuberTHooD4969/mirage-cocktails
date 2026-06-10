@@ -185,12 +185,10 @@
                             <span class="step-num">2</span>
                             <span class="step-line"></span>
                             <span class="step-num">3</span>
-                            <span class="step-line"></span>
-                            <span class="step-num">4</span>
                         </div>
                         
-                        <h3 class="form-side-title"><i class="fa-solid fa-sliders gold-text"></i> Step 1: Configurator</h3>
-                        <p class="form-side-desc">Customize guest sizes, event durations, transport billing, and pick dates.</p>
+                        <h3 class="form-side-title"><i class="fa-solid fa-sliders gold-text"></i> Step 1: Event Setup</h3>
+                        <p class="form-side-desc">Choose your package, guest count, and select an available event date.</p>
                         
                         <div class="booking-form-grid">
                             <div class="form-group">
@@ -208,17 +206,6 @@
                                 <input type="number" id="formGuests" placeholder="e.g. 100" min="1" max="1000" required>
                             </div>
 
-                            <div class="form-group span-full">
-                                <label for="formDuration"><i class="fa-solid fa-clock"></i> Duration: <span id="durationVal" class="gold-text font-bold">5 Hours</span></label>
-                                <input type="range" id="formDuration" min="5" max="10" value="5" class="slider">
-                                <small class="form-help">Base package covers 5 hours. GHC 1,000/hr for extra hours.</small>
-                            </div>
-
-                            <div class="form-group span-full">
-                                <label for="formDistance"><i class="fa-solid fa-truck"></i> Distance: <span id="distanceVal" class="gold-text font-bold">0 KM</span> (+GHC 0)</label>
-                                <input type="range" id="formDistance" min="0" max="100" value="0" class="slider">
-                                <small class="form-help">Calculated from Accra HQ at GHC 15/KM transport fee.</small>
-                            </div>
 
                             <div class="form-group span-full">
                                 <label><i class="fa-solid fa-calendar-check"></i> Availability Calendar</label>
@@ -241,13 +228,15 @@
 
                             <div class="form-actions span-full">
                                 <div></div>
-                                <button type="button" class="btn btn-primary" id="btnGoToStep2">Next: Logistics & Bar <i class="fa-solid fa-chevron-right"></i></button>
+                                <button type="button" class="btn btn-primary" id="btnGoToStep2">Next: Contact Info <i class="fa-solid fa-chevron-right"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- BACK OF CARD (Step 2: Logistics & Bar Setup) -->
+
+
+                <!-- Step 2: Client Details -->
                 <div class="booking-card-side" id="step2Side">
                     <div class="booking-card-content">
                         <div class="step-indicator">
@@ -256,110 +245,9 @@
                             <span class="step-num active">2</span>
                             <span class="step-line"></span>
                             <span class="step-num">3</span>
-                            <span class="step-line"></span>
-                            <span class="step-num">4</span>
                         </div>
                         
-                        <h3 class="form-side-title"><i class="fa-solid fa-box-open gold-text"></i> Step 2: Bar & Logistics</h3>
-                        <p class="form-side-desc">Select counter configurations, add-ons, and location accessibility checklist.</p>
-                        
-                        <div class="booking-form-grid">
-                            <div class="form-group span-full">
-                                <label><i class="fa-solid fa-cube"></i> Bar Counter Configuration</label>
-                                <div class="bar-selector-grid">
-                                    <label class="bar-option-card">
-                                        <input type="radio" name="barTemplate" value="small" checked>
-                                        <div class="option-card-inner">
-                                            <i class="fa-solid fa-box"></i>
-                                            <strong>Compact Bar</strong>
-                                            <small>Standard setups</small>
-                                        </div>
-                                    </label>
-                                    <label class="bar-option-card">
-                                        <input type="radio" name="barTemplate" value="large">
-                                        <div class="option-card-inner">
-                                            <i class="fa-solid fa-table"></i>
-                                            <strong>Banqueting</strong>
-                                            <small>Extended table</small>
-                                        </div>
-                                    </label>
-                                    <label class="bar-option-card">
-                                        <input type="radio" name="barTemplate" value="led">
-                                        <div class="option-card-inner">
-                                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                            <strong>Glow LED Bar</strong>
-                                            <small>+ GHC 1,200</small>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-group span-full">
-                                <label><i class="fa-solid fa-plus-circle"></i> À la carte Add-ons</label>
-                                <div class="addons-selector-grid">
-                                    <label class="addon-checkbox-label">
-                                        <input type="checkbox" id="addonGlassware" value="glassware">
-                                        <span class="addon-info">
-                                            <strong>Premium Glassware Service (+GHC 1,500)</strong>
-                                            <small>Serve signature drinks in custom leaded crystal goblets.</small>
-                                        </span>
-                                    </label>
-                                    <label class="addon-checkbox-label">
-                                        <input type="checkbox" id="addonWorkshop" value="workshop">
-                                        <span class="addon-info">
-                                            <strong>Mixology Workshop (+GHC 2,500)</strong>
-                                            <small>1-hour masterclass for guests to mix their own drinks.</small>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="logisticsFloors"><i class="fa-solid fa-stairs"></i> Floor Level</label>
-                                <input type="number" id="logisticsFloors" min="0" value="0">
-                            </div>
-
-                            <div class="form-group" style="justify-content: flex-end; padding-bottom: 5px;">
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="logisticsElevator">
-                                    <span>Elevator Available?</span>
-                                </label>
-                            </div>
-
-                            <div class="form-group span-full">
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="logisticsPower" required checked>
-                                    <span>Mandatory: Dedicated 13A socket within 10 meters of setup?</span>
-                                </label>
-                            </div>
-
-                            <div class="form-group span-full">
-                                <label for="logisticsNotes"><i class="fa-solid fa-circle-info"></i> Access/Delivery Details</label>
-                                <input type="text" id="logisticsNotes" placeholder="e.g. Back door ramp access, loading dock code... (Optional)">
-                            </div>
-
-                            <div class="form-actions span-full">
-                                <button type="button" class="btn btn-outline" id="btnBackToStep1"><i class="fa-solid fa-chevron-left"></i> Back</button>
-                                <button type="button" class="btn btn-primary" id="btnGoToStep3">Next: Client Info <i class="fa-solid fa-chevron-right"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TOP OF CARD (Step 3: Client Details) -->
-                <div class="booking-card-side" id="step3Side">
-                    <div class="booking-card-content">
-                        <div class="step-indicator">
-                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
-                            <span class="step-line active"></span>
-                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
-                            <span class="step-line active"></span>
-                            <span class="step-num active">3</span>
-                            <span class="step-line"></span>
-                            <span class="step-num">4</span>
-                        </div>
-                        
-                        <h3 class="form-side-title"><i class="fa-solid fa-id-card gold-text"></i> Step 3: Contact Info</h3>
+                        <h3 class="form-side-title"><i class="fa-solid fa-id-card gold-text"></i> Step 2: Contact Info</h3>
                         <p class="form-side-desc">Tell us who we are mixing for. Details are kept completely secure.</p>
                         
                         <form id="contactForm" class="booking-form-grid">
@@ -389,28 +277,25 @@
                             </div>
 
                             <div class="form-actions span-full">
-                                <button type="button" class="btn btn-outline" id="btnBackToStep2"><i class="fa-solid fa-chevron-left"></i> Back</button>
-                                <button type="button" class="btn btn-primary" id="btnGoToStep4">Next: Review Invoice <i class="fa-solid fa-chevron-right"></i></button>
+                                <button type="button" class="btn btn-outline" id="btnBackToStep1"><i class="fa-solid fa-chevron-left"></i> Back</button>
+                                <button type="button" class="btn btn-primary" id="btnGoToStep3">Next: Review Invoice <i class="fa-solid fa-chevron-right"></i></button>
                             </div>
                         </form>
                     </div>
                 </div>
 
-                <!-- BOTTOM OF CARD (Step 4: Review Summary & Secure Stripe Payment checkout) -->
-                <!-- Styled as class side-checkout to support 180x-180y flip rotation -->
-                <div class="booking-card-side" id="step4Side">
+                <!-- Step 3: Review Summary & Secure Paystack Payment -->
+                <div class="booking-card-side" id="step3Side">
                     <div class="booking-card-content">
                         <div class="step-indicator">
                             <span class="step-num done"><i class="fa-solid fa-check"></i></span>
                             <span class="step-line active"></span>
                             <span class="step-num done"><i class="fa-solid fa-check"></i></span>
                             <span class="step-line active"></span>
-                            <span class="step-num done"><i class="fa-solid fa-check"></i></span>
-                            <span class="step-line active"></span>
-                            <span class="step-num active">4</span>
+                            <span class="step-num active">3</span>
                         </div>
                         
-                        <h3 class="form-side-title"><i class="fa-solid fa-file-invoice-dollar gold-text"></i> Step 4: Invoice & Payment</h3>
+                        <h3 class="form-side-title"><i class="fa-solid fa-file-invoice-dollar gold-text"></i> Step 3: Invoice & Payment</h3>
                         <p class="form-side-desc">Review your package specifications and pay the 70% deposit to lock the date.</p>
                         
                         <div class="booking-form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -423,17 +308,11 @@
                                     <span class="review-label">Event Date:</span>
                                     <span class="review-val font-semibold" id="revDate">-</span>
 
+                                    <span class="review-label">Package:</span>
+                                    <span class="review-val font-semibold" id="revPackage">-</span>
+
                                     <span class="review-label">Guests:</span>
                                     <span class="review-val" id="revGuests">-</span>
-
-                                    <span class="review-label">Duration:</span>
-                                    <span class="review-val" id="revDuration">-</span>
-
-                                    <span class="review-label">Bar Template:</span>
-                                    <span class="review-val" id="revBarTemplate">-</span>
-
-                                    <span class="review-label">Transport:</span>
-                                    <span class="review-val" id="revTransport">-</span>
 
                                     <span class="review-label span-full divider"></span>
 
@@ -456,7 +335,7 @@
                                 <div>
                                     <h4 style="font-size:0.95rem; color: var(--gold-light); margin-bottom: 0.8rem;"><i class="fa-solid fa-shield-halved"></i> Secure Paystack Checkout</h4>
                                     <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
-                                        You will pay your deposit securely via **Paystack**. We accept:
+                                        You will pay your deposit securely via Paystack. We accept:
                                     </p>
                                     <ul style="list-style: none; padding: 0; margin: 0 0 1.2rem 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
                                         <li><i class="fa-solid fa-mobile-screen-button" style="color: var(--gold); margin-right: 6px;"></i> Mobile Money (MTN, Telecel, AT)</li>
@@ -478,7 +357,7 @@
                             </div>
 
                             <div class="form-actions span-full" style="margin-top: 0.8rem;">
-                                <button type="button" class="btn btn-outline" id="btnBackToStep3"><i class="fa-solid fa-chevron-left"></i> Back</button>
+                                <button type="button" class="btn btn-outline" id="btnBackToStep2"><i class="fa-solid fa-chevron-left"></i> Back</button>
                                 <button type="button" class="btn btn-submit-order btn-primary" id="btnSubmitBooking" style="padding: 0.65rem 1.5rem; font-size:0.95rem;">
                                     Secure Deposit Payment & Book <i class="fa-solid fa-lock" style="margin-left:6px;"></i>
                                 </button>

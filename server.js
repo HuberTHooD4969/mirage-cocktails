@@ -381,8 +381,7 @@ app.get('/api/availability', async (req, res) => {
 app.post('/api/bookings', bookingLimiter, async (req, res) => {
   const { 
     name, email, phone, instagram, notes,
-    date, guests, packageType, durationHours,
-    accessibility, addons, barTemplate, distanceKm
+    date, guests, packageType
   } = req.body;
 
   // Validate inputs
@@ -391,8 +390,6 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
   }
 
   const guestCount = parseInt(guests, 10);
-  const duration = parseInt(durationHours, 10) || 5;
-  const distance = parseFloat(distanceKm) || 0;
 
   if (isNaN(guestCount) || guestCount <= 0) {
     return res.status(400).json({ error: 'Guests count must be a positive number.' });
@@ -409,7 +406,6 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
   let basePrice = 0;
   let isCustom = false;
   let packageName = '';
-  let drinksPerGuest = 4;
 
   if (guestCount > 200) {
     isCustom = true;
@@ -423,48 +419,10 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
     }
     packageName = pkg.name;
     basePrice = pkg.price;
-    drinksPerGuest = pkg.drinksPerGuest;
   }
-
-  // Calculate Extra Hours Cost (GHC 1,000 per hour above package base of 5 hours)
-  const defaultHours = 5;
-  let extraHoursCost = 0;
-  if (duration > defaultHours) {
-    extraHoursCost = (duration - defaultHours) * 1000;
-  }
-
-  // Calculate Addons Cost
-  let addonsCost = 0;
-  const activeAddons = [];
-  
-  if (addons && Array.isArray(addons)) {
-    addons.forEach(addon => {
-      if (addon === 'glassware') {
-        addonsCost += 1500;
-        activeAddons.push({ id: 'glassware', name: 'Premium Glassware Service', price: 1500 });
-      }
-      if (addon === 'workshop') {
-        addonsCost += 2500;
-        activeAddons.push({ id: 'workshop', name: 'Mixology Creative Workshop', price: 2500 });
-      }
-    });
-  }
-
-  // LED bar template extra charge
-  let barCost = 0;
-  let barLabel = 'Compact Counter (Small)';
-  if (barTemplate === 'large') {
-    barLabel = 'Elite Banquet Counter (Large)';
-  } else if (barTemplate === 'led') {
-    barCost = 1200;
-    barLabel = 'Premium Glow Counter (LED Display)';
-  }
-
-  // Transport calculation (GHC 15 per km)
-  const transportCost = Math.round(distance * 15);
 
   // Totals calculations (70% deposit, 30% balance)
-  let totalPrice = basePrice + extraHoursCost + addonsCost + barCost + transportCost;
+  let totalPrice = basePrice;
   let deposit = totalPrice * 0.70;
   let balance = totalPrice * 0.30;
 
@@ -497,21 +455,13 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
     guests: guestCount,
     packageType,
     packageName,
-    durationHours: duration,
+    durationHours: 5,
     isCustom,
-    barTemplate: barTemplate || 'small',
-    barLabel,
-    addons: activeAddons,
-    logistics: {
-      floors: parseInt(accessibility?.floors, 10) || 0,
-      elevator: accessibility?.elevator === 'true' || accessibility?.elevator === true,
-      powerSupply: accessibility?.powerSupply === 'true' || accessibility?.powerSupply === true,
-      notes: accessibility?.notes || 'None'
-    },
-    mileage: {
-      distanceKm: distance,
-      transportCost
-    },
+    barTemplate: 'standard',
+    barLabel: 'Standard',
+    addons: [],
+    logistics: {},
+    mileage: {},
     totalPrice: formattedTotal,
     deposit: formattedDeposit,
     balance: formattedBalance,

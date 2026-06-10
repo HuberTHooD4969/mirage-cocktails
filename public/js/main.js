@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Mirage Cocktails - Upgraded Client Interaction Script
+   Mirage Cocktails - Client Interaction Script
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -236,17 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingCard = document.getElementById('bookingCard');
     const formPackage = document.getElementById('formPackage');
     const formGuests = document.getElementById('formGuests');
-    const formDuration = document.getElementById('formDuration');
-    const durationVal = document.getElementById('durationVal');
-    const formDistance = document.getElementById('formDistance');
-    const distanceVal = document.getElementById('distanceVal');
-    
-    const addonGlassware = document.getElementById('addonGlassware');
-    const addonWorkshop = document.getElementById('addonWorkshop');
-    const logisticsFloors = document.getElementById('logisticsFloors');
-    const logisticsElevator = document.getElementById('logisticsElevator');
-    const logisticsPower = document.getElementById('logisticsPower');
-    const logisticsNotes = document.getElementById('logisticsNotes');
 
     const formName = document.getElementById('formName');
     const formEmail = document.getElementById('formEmail');
@@ -272,24 +261,14 @@ document.addEventListener('DOMContentLoaded', () => {
         premium: 11500
     };
 
-    // Slider range indicators
-    if (formDuration) {
-        formDuration.addEventListener('input', () => {
-            durationVal.textContent = `${formDuration.value} Hours`;
-            calculateCosts();
-        });
-    }
-
-    if (formDistance) {
-        formDistance.addEventListener('input', () => {
-            const cost = formDistance.value * 15;
-            distanceVal.textContent = `${formDistance.value} KM (+GHC ${cost.toLocaleString()})`;
-            calculateCosts();
-        });
-    }
+    const packageNames = {
+        silver: 'Silver Package',
+        gold: 'Gold Package',
+        premium: 'Premium Package'
+    };
 
     // Attach calculator update events
-    [formPackage, formGuests, addonGlassware, addonWorkshop].forEach(el => {
+    [formPackage, formGuests].forEach(el => {
         if (el) el.addEventListener('change', calculateCosts);
     });
     if (formGuests) formGuests.addEventListener('input', calculateCosts);
@@ -297,33 +276,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic calculations object
     let currentCalculation = {
         packageType: '',
+        packageName: '',
         guests: 0,
-        duration: 5,
         total: 0,
         deposit: 0,
         balance: 0,
-        balanceDueDate: '',
-        barTemplate: 'small',
-        distance: 0,
-        transportCost: 0,
-        addonsCost: 0,
-        extraHoursCost: 0,
-        barTemplateCost: 0
+        balanceDueDate: ''
     };
 
     function calculateCosts() {
         const pkg = formPackage.value;
         const guestCount = parseInt(formGuests.value, 10);
         const eventDateStr = formDate.value;
-        const duration = parseInt(formDuration.value, 10) || 5;
-        const distance = parseFloat(formDistance.value) || 0;
 
         if (!pkg || isNaN(guestCount) || guestCount <= 0) return;
 
         currentCalculation.packageType = pkg;
+        currentCalculation.packageName = packageNames[pkg] || pkg;
         currentCalculation.guests = guestCount;
-        currentCalculation.duration = duration;
-        currentCalculation.distance = distance;
 
         // Custom Pricing (> 200 Guests)
         if (guestCount > 200) {
@@ -333,34 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentCalculation.balanceDueDate = 'N/A';
         } else {
             const basePrice = prices[pkg] || 0;
-            
-            // Extra hours (GHC 1,000 / hr over base of 5 hours)
-            let extraHoursCost = 0;
-            if (duration > 5) {
-                extraHoursCost = (duration - 5) * 1000;
-            }
-            currentCalculation.extraHoursCost = extraHoursCost;
+            const total = basePrice;
 
-            // Addons
-            let addonsCost = 0;
-            if (addonGlassware && addonGlassware.checked) addonsCost += 1500;
-            if (addonWorkshop && addonWorkshop.checked) addonsCost += 2500;
-            currentCalculation.addonsCost = addonsCost;
-
-            // Bar Template Cost
-            let barTemplateCost = 0;
-            const barOption = document.querySelector('input[name="barTemplate"]:checked');
-            if (barOption && barOption.value === 'led') {
-                barTemplateCost = 1200;
-            }
-            currentCalculation.barTemplateCost = barTemplateCost;
-
-            // Mileage transport cost
-            const transportCost = distance * 15;
-            currentCalculation.transportCost = transportCost;
-
-            // Calculate Grand Total
-            const total = basePrice + extraHoursCost + addonsCost + barTemplateCost + transportCost;
             currentCalculation.total = total;
             currentCalculation.deposit = total * 0.70;
             currentCalculation.balance = total * 0.30;
@@ -380,10 +324,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateInvoiceScreen() {
         const revName = document.getElementById('revName');
         const revDate = document.getElementById('revDate');
+        const revPackage = document.getElementById('revPackage');
         const revGuests = document.getElementById('revGuests');
-        const revDuration = document.getElementById('revDuration');
-        const revBarTemplate = document.getElementById('revBarTemplate');
-        const revTransport = document.getElementById('revTransport');
         const revTotal = document.getElementById('revTotal');
         const revDeposit = document.getElementById('revDeposit');
         const revBalance = document.getElementById('revBalance');
@@ -393,18 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         revName.textContent = formName.value || '-';
         revDate.textContent = formDate.value || 'Not Selected';
+        revPackage.textContent = currentCalculation.packageName || '-';
         revGuests.textContent = formGuests.value || '0';
-        revDuration.textContent = `${formDuration.value} Hours (Base + ${formDuration.value - 5} extra)`;
-        
-        const barOption = document.querySelector('input[name="barTemplate"]:checked');
-        let barLabel = 'Compact Bar';
-        if (barOption) {
-            if (barOption.value === 'large') barLabel = 'Banqueting Bar';
-            if (barOption.value === 'led') barLabel = 'Glow LED Bar (+GHC 1,200)';
-        }
-        revBarTemplate.textContent = barLabel;
-
-        revTransport.textContent = `GHC ${currentCalculation.transportCost.toLocaleString()} (${formDistance.value} KM)`;
 
         if (typeof currentCalculation.total === 'number') {
             revTotal.textContent = `GHC ${currentCalculation.total.toLocaleString()}`;
@@ -421,18 +353,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------------------------
-    // 6. Step Wizard Navigation Logic (Slide/Fade Transitions)
+    // 6. Step Wizard Navigation Logic (3-Step: Setup -> Contact -> Payment)
     // ----------------------------------------------------------------------
     const btnGoToStep2 = document.getElementById('btnGoToStep2');
     const btnBackToStep1 = document.getElementById('btnBackToStep1');
     const btnGoToStep3 = document.getElementById('btnGoToStep3');
     const btnBackToStep2 = document.getElementById('btnBackToStep2');
-    const btnGoToStep4 = document.getElementById('btnGoToStep4');
-    const btnBackToStep3 = document.getElementById('btnBackToStep3');
     const btnSubmitBooking = document.getElementById('btnSubmitBooking');
 
     const allStepSides = document.querySelectorAll('.booking-card-side');
-    const stepSideIds = ['step1Side', 'step2Side', 'step3Side', 'step4Side'];
+    const stepSideIds = ['step1Side', 'step2Side', 'step3Side'];
 
     // Set active step by showing the correct panel and hiding others
     function setStep(stepNumber) {
@@ -473,14 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const validateStep2 = () => {
-        if (!logisticsPower.checked) {
-            alert('Accessibility terms require a dedicated 13A socket within 10 meters. Please confirm logistics check.');
-            return false;
-        }
-        return true;
-    };
-
-    const validateStep3 = () => {
         if (!formName.value.trim()) {
             alert('Please enter your full name.');
             return false;
@@ -515,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnGoToStep3.addEventListener('click', () => {
             if (validateStep2()) {
                 setStep(3);
+                calculateCosts();
             }
         });
     }
@@ -522,21 +445,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnBackToStep2) {
         btnBackToStep2.addEventListener('click', () => {
             setStep(2);
-        });
-    }
-
-    if (btnGoToStep4) {
-        btnGoToStep4.addEventListener('click', () => {
-            if (validateStep3()) {
-                setStep(4);
-                calculateCosts();
-            }
-        });
-    }
-
-    if (btnBackToStep3) {
-        btnBackToStep3.addEventListener('click', () => {
-            setStep(3);
         });
     }
 
@@ -563,12 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btnSubmitBooking.disabled = true;
             btnSubmitBooking.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing Paystack...';
 
-            const activeAddonsList = [];
-            if (addonGlassware.checked) activeAddonsList.push('glassware');
-            if (addonWorkshop.checked) activeAddonsList.push('workshop');
-
-            const barOption = document.querySelector('input[name="barTemplate"]:checked');
-
             const payload = {
                 name: formName.value.trim(),
                 email: formEmail.value.trim(),
@@ -577,16 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 date: formDate.value,
                 guests: parseInt(formGuests.value, 10),
                 packageType: formPackage.value,
-                durationHours: parseInt(formDuration.value, 10),
-                barTemplate: barOption ? barOption.value : 'small',
-                addons: activeAddonsList,
-                distanceKm: parseFloat(formDistance.value) || 0,
-                accessibility: {
-                    floors: parseInt(logisticsFloors.value, 10) || 0,
-                    elevator: logisticsElevator.checked,
-                    powerSupply: logisticsPower.checked,
-                    notes: logisticsNotes.value.trim()
-                },
                 notes: formNotes.value.trim()
             };
 
@@ -716,16 +608,6 @@ document.addEventListener('DOMContentLoaded', () => {
             formGuests.value = '';
             formPackage.value = '';
             formDate.value = '';
-            formDuration.value = 5;
-            durationVal.textContent = '5 Hours';
-            formDistance.value = 0;
-            distanceVal.textContent = '0 KM (+GHC 0)';
-            
-            addonGlassware.checked = false;
-            addonWorkshop.checked = false;
-            logisticsFloors.value = 0;
-            logisticsElevator.checked = false;
-            logisticsNotes.value = '';
             policyAgreement.checked = false;
 
             calendarWarn.textContent = 'Select an open, highlighted date grid slot.';
