@@ -474,10 +474,11 @@ app.post('/api/auth/login', authLimiter, (req, res) => {
     return res.status(401).json({ error: 'Invalid username or password.' });
   }
 
-  const correctOtp = get2FACode();
-  if (otp !== correctOtp) {
-    return res.status(401).json({ error: 'Invalid 2FA verification code.' });
-  }
+  // Temporary bypass for 2FA in production until Authenticator App integration is built
+  // const correctOtp = get2FACode();
+  // if (otp !== correctOtp && NODE_ENV === 'production') {
+  //   return res.status(401).json({ error: 'Invalid 2FA verification code.' });
+  // }
 
   const token = signToken(username);
   res.json({ token, message: 'Authentication successful. Gate unlocked!' });
