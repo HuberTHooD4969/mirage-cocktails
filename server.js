@@ -383,21 +383,6 @@ const logNotification = (bookingId, type, recipient, message) => {
   notify(bookingId, type, recipient, message);
 };
 
-// 2FA Rolling Code Generator (changes every 30 seconds)
-const get2FACode = () => {
-  const timeStep = Math.floor(Date.now() / 30000);
-  const hash = crypto.createHmac('sha256', OTP_SECRET).update(timeStep.toString()).digest('hex');
-  const num = parseInt(hash.substring(0, 8), 16);
-  return String(num % 1000000).padStart(6, '0');
-};
-
-// Log 2FA code to server terminal (only in development, every 30 seconds)
-if (NODE_ENV === 'development') {
-  setInterval(() => {
-    console.log(`[Mirage Security] Active 2FA OTP Code: ${get2FACode()}`);
-  }, 30000);
-}
-
 // Custom JWT Signer (Zero-dependency JWT-like token implementation)
 const signToken = (username) => {
   const expiry = Date.now() + (60 * 60 * 1000); // 1 hour expiration
@@ -458,27 +443,15 @@ app.get('/api/config', (req, res) => {
   });
 });
 
-// Retrieve rolling 2FA for Dev Mock Display (DISABLED in production)
-app.get('/api/auth/2fa-mock', (req, res) => {
-  if (NODE_ENV === 'production') {
-    return res.status(404).json({ error: 'Not available.' });
-  }
-  res.json({ code: get2FACode() });
-});
 
-// Admin Authentication Login (Username, Password & 2FA OTP verification)
+
+// Admin Authentication Login (Username & Password)
 app.post('/api/auth/login', authLimiter, (req, res) => {
-  const { username, password, otp } = req.body;
+  const { username, password } = req.body;
 
   if (username !== ADMIN_USER || password !== ADMIN_PASS) {
     return res.status(401).json({ error: 'Invalid username or password.' });
   }
-
-  // Temporary bypass for 2FA in production until Authenticator App integration is built
-  // const correctOtp = get2FACode();
-  // if (otp !== correctOtp && NODE_ENV === 'production') {
-  //   return res.status(401).json({ error: 'Invalid 2FA verification code.' });
-  // }
 
   const token = signToken(username);
   res.json({ token, message: 'Authentication successful. Gate unlocked!' });
@@ -808,10 +781,7 @@ app.listen(PORT, () => {
   console.log(`[Mirage Security] Security headers: ON | Rate limiting: ON`);
   if (NODE_ENV === 'development') {
     console.log(`[Mirage Backend] Admin Credentials - User: ${ADMIN_USER}, Pass: ${ADMIN_PASS}`);
-    console.log(`[Mirage Security] 2FA mock endpoint: ENABLED (dev only)`);
-    console.log(`[Mirage Security] Active 2FA OTP Code: ${get2FACode()}`);
   } else {
-    console.log(`[Mirage Security] 2FA mock endpoint: DISABLED`);
     console.log(`[Mirage Security] Credentials loaded from environment variables.`);
   }
 });

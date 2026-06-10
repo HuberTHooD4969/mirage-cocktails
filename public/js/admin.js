@@ -43,23 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let allBookings = [];
 
     // ----------------------------------------------------------------------
-    // 1. JWT Session & 2FA Login Gate
+    // 1. JWT Session Login Gate
     // ----------------------------------------------------------------------
-
-    // Fetch and display active 2FA Mock OTP rolling code for easy developer logging
-    const pollMock2FA = async () => {
-        try {
-            const res = await fetch('/api/auth/2fa-mock');
-            const data = await res.json();
-            if (devOtpVal) devOtpVal.textContent = data.code;
-        } catch (err) {
-            console.error('Failed to fetch rolling dev 2FA OTP:', err);
-        }
-    };
-
-    // Poll OTP code every 5 seconds
-    pollMock2FA();
-    setInterval(pollMock2FA, 5000);
 
     // Check session storage for existing JWT token
     const savedToken = sessionStorage.getItem('adminToken');
@@ -72,13 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const username = adminUsernameInput.value.trim();
             const password = adminPasswordInput.value.trim();
-            const otp = adminOtpInput.value.trim();
 
             try {
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, otp })
+                    body: JSON.stringify({ username, password })
                 });
 
                 const data = await response.json();
