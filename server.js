@@ -19,7 +19,9 @@ const NOTIFICATION_LOG = path.join(LOGS_DIR, 'notifications.log');
 const SERVER_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 const ADMIN_USER = process.env.ADMIN_USER || 'MIRAGE';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'MIRAGE26';
-const OTP_SECRET = process.env.OTP_SECRET || 'mirage-secure-2fa-secret-2285';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM || 'admin@miragecocktails.com';
+
+let activeAdminOtp = { code: null, expiresAt: 0 };
 
 // Security Headers Middleware
 app.use((req, res, next) => {
@@ -442,8 +444,6 @@ app.get('/api/config', (req, res) => {
     paystackSubaccount: process.env.PAYSTACK_SUBACCOUNT || ''
   });
 });
-
-
 
 // Admin Authentication Login (Username & Password)
 app.post('/api/auth/login', authLimiter, (req, res) => {

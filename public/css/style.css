@@ -1247,6 +1247,7 @@ h1, h2, h3, h4 {
 
 .admin-auth-card {
     max-width: 420px;
+    width: 90%;
     margin: 6rem auto;
     padding: 3rem 2.5rem;
     text-align: center;
@@ -1381,6 +1382,102 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
+   Step 3 and Terms Summary CSS (Replaces inline styles)
+   ========================================================================== */
+.step3-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.invoice-box {
+    margin-bottom: 0;
+    padding: 1.1rem;
+    height: 310px;
+    overflow-y: auto;
+}
+
+.payment-box {
+    margin-bottom: 0;
+    padding: 1.1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.payment-title {
+    font-size: 0.95rem;
+    color: var(--gold-light);
+    margin-bottom: 0.8rem;
+}
+
+.payment-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin-bottom: 1rem;
+}
+
+.payment-methods {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    font-size: 0.82rem;
+}
+
+.pci-secure-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.terms-summary-card {
+    max-width: 100%;
+    width: 100%;
+    text-align: left;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    margin: 0;
+    border: 1px solid var(--glass-border);
+}
+
+.terms-icon {
+    margin: 0 0 1.5rem 0;
+    width: 55px;
+    height: 55px;
+    font-size: 1.6rem;
+}
+
+.terms-summary-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+    color: var(--gold-light);
+    font-family: var(--font-heading);
+}
+
+.terms-divider {
+    width: 50px;
+    height: 2px;
+    background: var(--gold);
+    margin-bottom: 1.5rem;
+}
+
+.terms-summary-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    padding: 0;
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 @media (max-width: 1024px) {
@@ -1456,7 +1553,7 @@ h1, h2, h3, h4 {
         margin: 0 auto;
     }
     
-    .booking-form-grid {
+    .booking-form-grid, .step3-grid {
         grid-template-columns: 1fr;
     }
     
@@ -1530,6 +1627,19 @@ h1, h2, h3, h4 {
     
     .review-grid .divider {
         margin: 8px 0;
+    }
+
+    .terms-summary-card {
+        padding: 1.5rem;
+    }
+
+    .admin-auth-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .invoice-box {
+        height: auto;
+        min-height: 250px;
     }
 }
 

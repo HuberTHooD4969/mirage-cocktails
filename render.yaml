@@ -17,7 +17,15 @@ services:
         sync: false
       - key: ADMIN_PASS
         sync: false
-      - key: OTP_SECRET
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
         sync: false
       - key: JWT_SECRET
         sync: false

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const authForm = document.getElementById('authForm');
     const adminUsernameInput = document.getElementById('adminUsername');
     const adminPasswordInput = document.getElementById('adminPassword');
-    const adminOtpInput = document.getElementById('adminOtp');
+    const btnAuth = document.getElementById('btnAuth');
     const authError = document.getElementById('authError');
     const btnLogout = document.getElementById('btnLogout');
     const devOtpVal = document.getElementById('devOtpVal');
@@ -58,13 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = adminUsernameInput.value.trim();
             const password = adminPasswordInput.value.trim();
 
+            authError.style.display = 'none';
+            btnAuth.innerHTML = 'Signing In... <i class="fa-solid fa-spinner fa-spin"></i>';
+            btnAuth.disabled = true;
+
             try {
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -77,7 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 sessionStorage.removeItem('adminToken');
                 authError.style.display = 'block';
-                authError.textContent = err.message;
+                authError.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${err.message}`;
+                btnAuth.innerHTML = 'Sign In <i class="fa-solid fa-arrow-right-to-bracket"></i>';
+                btnAuth.disabled = false;
             }
         });
     }
