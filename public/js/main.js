@@ -543,8 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     currency: 'GHS',
                     channels: paystackChannels,
                     reference: b.id + '_' + Date.now(), // unique checkout transaction reference
-                    callback: async function(paystackResponse) {
-                        btnSubmitBooking.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying Payment...';
+                    callback: function(paystackResponse) {
+                        (async () => {
+                            btnSubmitBooking.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying Payment...';
                         try {
                             // Verify payment on backend
                             const verifyRes = await fetch(`/api/bookings/${b.id}/verify-payment`, {
@@ -574,6 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             btnSubmitBooking.disabled = false;
                             btnSubmitBooking.innerHTML = 'Secure Deposit Payment & Book <i class="fa-solid fa-lock" style="margin-left:6px;"></i>';
                         }
+                        })();
                     },
                     onClose: function() {
                         alert(`Checkout closed. Your booking request (ID: ${b.id}) is saved as PENDING. Contact support to finalize deposit payment.`);
