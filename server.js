@@ -501,7 +501,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 });
 
 // Update Admin Password
-app.put('/api/auth/password', authenticateToken, async (req, res) => {
+app.put('/api/auth/password', authenticateAdmin, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   if (!currentPassword || !newPassword) {
     return res.status(400).json({ error: 'Missing password fields.' });
