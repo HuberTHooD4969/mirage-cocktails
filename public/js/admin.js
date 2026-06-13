@@ -40,6 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCloseEdit = document.getElementById('btnCloseEdit');
     const btnDeleteBookingAction = document.getElementById('btnDeleteBookingAction');
 
+    // Password feature
+    const navChangePassword = document.getElementById('navChangePassword');
+    const passwordModal = document.getElementById('passwordModal');
+    const btnClosePassword = document.getElementById('btnClosePassword');
+    const passwordForm = document.getElementById('passwordForm');
+    const currentPassword = document.getElementById('currentPassword');
+    const newPassword = document.getElementById('newPassword');
+    const confirmNewPassword = document.getElementById('confirmNewPassword');
+    const btnSubmitPassword = document.getElementById('btnSubmitPassword');
+
     let allBookings = [];
 
     // ----------------------------------------------------------------------
@@ -91,6 +101,55 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogout.addEventListener('click', () => {
             sessionStorage.removeItem('adminToken');
             window.location.reload();
+        });
+    }
+
+    // --- Password Change Logic ---
+    if (navChangePassword) {
+        navChangePassword.addEventListener('click', () => {
+            passwordForm.reset();
+            passwordModal.classList.add('active');
+        });
+    }
+    if (btnClosePassword) {
+        btnClosePassword.addEventListener('click', () => {
+            passwordModal.classList.remove('active');
+        });
+    }
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (newPassword.value !== confirmNewPassword.value) {
+                alert("New passwords do not match!");
+                return;
+            }
+            btnSubmitPassword.disabled = true;
+            btnSubmitPassword.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Updating...';
+            try {
+                const token = sessionStorage.getItem('adminToken');
+                const res = await fetch('/api/auth/password', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        currentPassword: currentPassword.value,
+                        newPassword: newPassword.value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                
+                alert("Password updated successfully! Please log in again.");
+                passwordModal.classList.remove('active');
+                if (btnLogout) btnLogout.click();
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btnSubmitPassword.disabled = false;
+                btnSubmitPassword.textContent = 'Update Password';
+            }
         });
     }
 

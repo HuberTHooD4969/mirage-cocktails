@@ -206,6 +206,12 @@ const db = new sqlite3.Database(DB_FILE, (err) => {
 // Create schema and migrate old data if needed
 db.serialize(() => {
   db.run(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )
+  `);
+  db.run(`
     CREATE TABLE IF NOT EXISTS bookings (
       id TEXT PRIMARY KEY,
       name TEXT,
@@ -271,6 +277,24 @@ db.serialize(() => {
 });
 
 // Database Query Wrappers (Promise-based)
+const getSetting = (key) => {
+  return new Promise((resolve) => {
+    db.get("SELECT value FROM settings WHERE key = ?", [key], (err, row) => {
+      if (err || !row) return resolve(null);
+      resolve(row.value);
+    });
+  });
+};
+
+const setSetting = (key, value) => {
+  return new Promise((resolve, reject) => {
+    db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value], (err) => {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
+};
+
 const getAllBookings = () => {
   return new Promise((resolve, reject) => {
     db.all("SELECT * FROM bookings ORDER BY createdAt DESC", [], (err, rows) => {
@@ -448,15 +472,67 @@ app.get('/api/config', (req, res) => {
 });
 
 // Admin Authentication Login (Username & Password)
-app.post('/api/auth/login', authLimiter, (req, res) => {
+app.post('/api/auth/login', authLimiter, async (req, res) => {
   const { username, password } = req.body;
 
-  if (username !== ADMIN_USER || password !== ADMIN_PASS) {
+  if (username !== ADMIN_USER) {
+    return res.status(401).json({ error: 'Invalid username or password.' });
+  }
+
+  const customHash = await getSetting('admin_pass_hash');
+  let isValid = false;
+
+  if (customHash) {
+    const [salt, key] = customHash.split(':');
+    const hashedBuffer = crypto.scryptSync(password, salt, 64);
+    const keyBuffer = Buffer.from(key, 'hex');
+    isValid = crypto.timingSafeEqual(hashedBuffer, keyBuffer);
+  } else {
+    // Fallback to .env password
+    isValid = (password === ADMIN_PASS);
+  }
+
+  if (!isValid) {
     return res.status(401).json({ error: 'Invalid username or password.' });
   }
 
   const token = signToken(username);
   res.json({ token, message: 'Authentication successful. Gate unlocked!' });
+});
+
+// Update Admin Password
+app.put('/api/auth/password', authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Missing password fields.' });
+  }
+
+  // Verify current password
+  const customHash = await getSetting('admin_pass_hash');
+  let isValid = false;
+  if (customHash) {
+    const [salt, key] = customHash.split(':');
+    const hashedBuffer = crypto.scryptSync(currentPassword, salt, 64);
+    const keyBuffer = Buffer.from(key, 'hex');
+    isValid = crypto.timingSafeEqual(hashedBuffer, keyBuffer);
+  } else {
+    isValid = (currentPassword === ADMIN_PASS);
+  }
+
+  if (!isValid) {
+    return res.status(401).json({ error: 'Incorrect current password.' });
+  }
+
+  // Hash new password
+  const newSalt = crypto.randomBytes(16).toString('hex');
+  const newHash = crypto.scryptSync(newPassword, newSalt, 64).toString('hex');
+  
+  try {
+    await setSetting('admin_pass_hash', `${newSalt}:${newHash}`);
+    res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update password in database.' });
+  }
 });
 
 // Get Availability (blocked dates)

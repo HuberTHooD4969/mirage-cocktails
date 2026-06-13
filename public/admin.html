@@ -52,7 +52,8 @@
         <nav class="sidebar-nav">
             <a class="nav-item active" id="navBookings"><i class="fa-solid fa-table-list"></i> Bookings Manager</a>
             <a class="nav-item" id="navStock"><i class="fa-solid fa-boxes-stacked"></i> Stock Planner</a>
-            <a href="/" class="nav-item" style="margin-top: auto;"><i class="fa-solid fa-globe"></i> View Website</a>
+            <a class="nav-item" id="navChangePassword" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-gear"></i> Change Password</a>
+            <a href="/" class="nav-item" style="margin-top: 10px;"><i class="fa-solid fa-globe"></i> View Website</a>
         </nav>
     </aside>
 
@@ -210,6 +211,29 @@
             <div style="margin-top: 2rem; text-align: right;" class="no-print">
                 <button type="button" class="btn btn-primary" id="btnPrintRoadmapAction"><i class="fa-solid fa-print"></i> Print</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="modal-close" id="btnClosePassword"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1.5rem;"><i class="fa-solid fa-lock" style="color: var(--gold);"></i> Change Password</h2>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmNewPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" id="btnSubmitPassword" style="width: 100%; justify-content: center; margin-top: 1rem;">Update Password</button>
+            </form>
         </div>
     </div>
 
