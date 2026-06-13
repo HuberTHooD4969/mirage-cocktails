@@ -775,6 +775,15 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Global Error Handler for Invalid JSON
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('[Mirage Security] Invalid JSON payload intercepted:', err.message);
+    return res.status(400).json({ error: 'Bad Request. Invalid JSON payload.' });
+  }
+  next(err);
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`[Mirage Backend] Server running on port ${PORT} (${NODE_ENV})`);

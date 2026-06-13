@@ -532,11 +532,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 btnSubmitBooking.innerHTML = '<i class="fa-solid fa-credit-card"></i> Awaiting Payment...';
 
+                // Get selected payment channel
+                const selectedChannel = document.querySelector('input[name="paymentChannel"]:checked').value;
+                const paystackChannels = selectedChannel === 'mobile_money' ? ['mobile_money'] : ['card'];
+
                 const paystackOptions = {
                     key: paystackPublicKey,
                     email: b.email,
                     amount: Math.round(Number(b.deposit) * 100), // convert GHS to pesewas (minor units)
                     currency: 'GHS',
+                    channels: paystackChannels,
                     reference: b.id + '_' + Date.now(), // unique checkout transaction reference
                     callback: async function(paystackResponse) {
                         btnSubmitBooking.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying Payment...';

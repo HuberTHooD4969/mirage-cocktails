@@ -330,22 +330,30 @@
                                 </div>
                             </div>
 
-                            <!-- Secure Paystack Checkout Gateway -->
+                            <!-- Payment Method Selection UI -->
                             <div class="review-details-box payment-box">
-                                <div>
-                                    <h4 class="payment-title"><i class="fa-solid fa-shield-halved"></i> Secure Paystack Checkout</h4>
-                                    <p class="payment-desc">
-                                        You will pay your deposit securely via Paystack. We accept:
-                                    </p>
-                                    <ul class="payment-methods">
-                                        <li><i class="fa-solid fa-mobile-screen-button" style="color: var(--gold); margin-right: 6px;"></i> Mobile Money (MTN, Telecel, AT)</li>
-                                        <li><i class="fa-solid fa-credit-card" style="color: var(--gold); margin-right: 6px;"></i> Credit/Debit Cards (Visa, Mastercard)</li>
-                                        <li><i class="fa-solid fa-building-columns" style="color: var(--gold); margin-right: 6px;"></i> Secure Bank Transfers</li>
-                                    </ul>
-                                    <div class="pci-secure-notice">
-                                        <i class="fa-solid fa-lock" style="font-size: 0.95rem; color: var(--gold);"></i>
-                                        <span>PCI-DSS Secure Checkout Connection</span>
-                                    </div>
+                                <h4 class="payment-title" style="margin-bottom: 1rem;"><i class="fa-solid fa-wallet gold-text"></i> Select Payment Method</h4>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.2rem;">Choose your preferred payment method. Paystack will securely process your deposit.</p>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                                    <label class="payment-card" style="border: 2px solid var(--glass-border); border-radius: 8px; padding: 1.2rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(255,255,255,0.03); transition: all 0.3s;">
+                                        <input type="radio" name="paymentChannel" value="mobile_money" checked style="display: none;" onchange="updatePaymentCardStyles()">
+                                        <i class="fa-solid fa-mobile-screen-button" style="font-size: 2rem; color: var(--gold); margin-bottom: 0.8rem;"></i>
+                                        <span style="font-weight: 600; font-size: 0.95rem; display: block;">Mobile Money</span>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted);">MTN, Vodafone, AT</span>
+                                    </label>
+                                    
+                                    <label class="payment-card" style="border: 2px solid var(--glass-border); border-radius: 8px; padding: 1.2rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(255,255,255,0.03); transition: all 0.3s;">
+                                        <input type="radio" name="paymentChannel" value="card" style="display: none;" onchange="updatePaymentCardStyles()">
+                                        <i class="fa-regular fa-credit-card" style="font-size: 2rem; color: var(--gold); margin-bottom: 0.8rem;"></i>
+                                        <span style="font-weight: 600; font-size: 0.95rem; display: block;">Credit / Debit</span>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted);">Visa, Mastercard</span>
+                                    </label>
+                                </div>
+
+                                <div class="pci-secure-notice" style="margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                    <i class="fa-solid fa-lock" style="font-size: 0.95rem; color: #10b981;"></i>
+                                    <span style="color: #10b981; font-size: 0.8rem; font-weight: 500;">PCI-DSS Secure Checkout Connection</span>
                                 </div>
 
                                 <div class="policy-checkbox-area">
@@ -355,6 +363,23 @@
                                     </label>
                                 </div>
                             </div>
+                            
+                            <script>
+                                function updatePaymentCardStyles() {
+                                    document.querySelectorAll('.payment-card').forEach(card => {
+                                        const radio = card.querySelector('input[type="radio"]');
+                                        if (radio.checked) {
+                                            card.style.borderColor = 'var(--gold)';
+                                            card.style.background = 'rgba(212, 175, 55, 0.1)';
+                                        } else {
+                                            card.style.borderColor = 'var(--glass-border)';
+                                            card.style.background = 'rgba(255,255,255,0.03)';
+                                        }
+                                    });
+                                }
+                                // Initial call
+                                setTimeout(updatePaymentCardStyles, 100);
+                            </script>
 
                             <div class="form-actions span-full" style="margin-top: 0.8rem;">
                                 <button type="button" class="btn btn-outline" id="btnBackToStep2"><i class="fa-solid fa-chevron-left"></i> Back</button>
