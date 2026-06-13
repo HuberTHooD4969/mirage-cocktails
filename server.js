@@ -8,6 +8,7 @@ const sqlite3 = require('sqlite3').verbose();
 const nodemailer = require('nodemailer');
 
 const app = express();
+app.disable('x-powered-by'); // Hide Express version
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const DATA_FILE = path.join(__dirname, 'data', 'bookings.json');
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.paystack.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src https://checkout.paystack.com; img-src 'self' data:; connect-src 'self' https://api.paystack.co");
   if (NODE_ENV === 'production') {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
@@ -467,12 +469,22 @@ app.get('/api/availability', async (req, res) => {
   res.json(blockedDates);
 });
 
+// Helper to sanitize HTML tags from inputs
+const sanitizeInput = (str) => typeof str === 'string' ? str.replace(/<[^>]*>?/gm, '').trim() : str;
+
 // Create a booking with advanced specs
 app.post('/api/bookings', bookingLimiter, async (req, res) => {
-  const { 
+  let { 
     name, email, phone, instagram, notes,
     date, guests, packageType
   } = req.body;
+
+  // Sanitize text inputs to prevent XSS
+  name = sanitizeInput(name);
+  email = sanitizeInput(email);
+  phone = sanitizeInput(phone);
+  instagram = sanitizeInput(instagram);
+  notes = sanitizeInput(notes);
 
   // Validate inputs
   if (!name || !email || !phone || !date || !guests || !packageType) {
