@@ -5,6 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const authSection = document.getElementById('authSection');
     const dashboardSection = document.getElementById('dashboardSection');
+    const sidebarSection = document.getElementById('sidebarSection');
     const authForm = document.getElementById('authForm');
     const adminUsernameInput = document.getElementById('adminUsername');
     const adminPasswordInput = document.getElementById('adminPassword');
@@ -169,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allBookings = data;
             authSection.style.display = 'none';
             dashboardSection.style.display = 'block';
+            if (sidebarSection) sidebarSection.style.display = 'flex';
             btnLogout.style.display = 'block';
 
             applyFilterAndSearch();
@@ -179,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sessionStorage.removeItem('adminToken');
             authSection.style.display = 'block';
             dashboardSection.style.display = 'none';
+            if (sidebarSection) sidebarSection.style.display = 'none';
             btnLogout.style.display = 'none';
         }
     }
