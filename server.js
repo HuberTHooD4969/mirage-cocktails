@@ -259,7 +259,7 @@ db.serialize(() => {
           `);
           jsonBookings.forEach(b => {
             stmt.run(
-              b.id, b.name, b.email, b.phone, b.whatsapp || 'N/A', b.date, b.guests, b.packageType, b.packageName || '',
+              b.id, b.name, b.email, b.phone, b.whatsapp || b.instagram || 'N/A', b.date, b.guests, b.packageType, b.packageName || '',
               b.durationHours, b.isCustom ? 1 : 0, b.barTemplate || 'small', b.barLabel || '',
               JSON.stringify(b.addons || []), JSON.stringify(b.logistics || {}), JSON.stringify(b.mileage || {}),
               String(b.totalPrice), String(b.deposit), String(b.balance), b.balanceDueDate, b.notes || '',
