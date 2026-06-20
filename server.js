@@ -217,7 +217,7 @@ db.serialize(() => {
       name TEXT,
       email TEXT,
       phone TEXT,
-      instagram TEXT,
+      whatsapp TEXT,
       date TEXT,
       guests INTEGER,
       packageType TEXT,
@@ -251,7 +251,7 @@ db.serialize(() => {
           console.log(`[Mirage DB] Migrating ${jsonBookings.length} records from JSON file...`);
           const stmt = db.prepare(`
             INSERT INTO bookings (
-              id, name, email, phone, instagram, date, guests, packageType, packageName,
+              id, name, email, phone, whatsapp, date, guests, packageType, packageName,
               durationHours, isCustom, barTemplate, barLabel, addons, logistics, mileage,
               totalPrice, deposit, balance, balanceDueDate, notes, status, paymentReference,
               createdAt, updatedAt
@@ -259,7 +259,7 @@ db.serialize(() => {
           `);
           jsonBookings.forEach(b => {
             stmt.run(
-              b.id, b.name, b.email, b.phone, b.instagram || 'N/A', b.date, b.guests, b.packageType, b.packageName || '',
+              b.id, b.name, b.email, b.phone, b.whatsapp || 'N/A', b.date, b.guests, b.packageType, b.packageName || '',
               b.durationHours, b.isCustom ? 1 : 0, b.barTemplate || 'small', b.barLabel || '',
               JSON.stringify(b.addons || []), JSON.stringify(b.logistics || {}), JSON.stringify(b.mileage || {}),
               String(b.totalPrice), String(b.deposit), String(b.balance), b.balanceDueDate, b.notes || '',
@@ -339,13 +339,13 @@ const insertBooking = (b) => {
   return new Promise((resolve, reject) => {
     db.run(`
       INSERT INTO bookings (
-        id, name, email, phone, instagram, date, guests, packageType, packageName,
+        id, name, email, phone, whatsapp, date, guests, packageType, packageName,
         durationHours, isCustom, barTemplate, barLabel, addons, logistics, mileage,
         totalPrice, deposit, balance, balanceDueDate, notes, status, paymentReference,
         createdAt
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      b.id, b.name, b.email, b.phone, b.instagram || 'N/A', b.date, b.guests, b.packageType, b.packageName || '',
+      b.id, b.name, b.email, b.phone, b.whatsapp || 'N/A', b.date, b.guests, b.packageType, b.packageName || '',
       b.durationHours, b.isCustom ? 1 : 0, b.barTemplate || 'small', b.barLabel || '',
       JSON.stringify(b.addons || []), JSON.stringify(b.logistics || {}), JSON.stringify(b.mileage || {}),
       String(b.totalPrice), String(b.deposit), String(b.balance), b.balanceDueDate, b.notes || '',
@@ -551,7 +551,7 @@ const sanitizeInput = (str) => typeof str === 'string' ? str.replace(/<[^>]*>?/g
 // Create a booking with advanced specs
 app.post('/api/bookings', bookingLimiter, async (req, res) => {
   let { 
-    name, email, phone, instagram, notes,
+    name, email, phone, whatsapp, notes,
     date, guests, packageType
   } = req.body;
 
@@ -559,7 +559,7 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
   name = sanitizeInput(name);
   email = sanitizeInput(email);
   phone = sanitizeInput(phone);
-  instagram = sanitizeInput(instagram);
+  whatsapp = sanitizeInput(whatsapp);
   notes = sanitizeInput(notes);
 
   // Validate inputs
@@ -621,7 +621,7 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
     name,
     email,
     phone,
-    instagram: instagram || 'N/A',
+    whatsapp: whatsapp || 'N/A',
     date,
     guests: guestCount,
     packageType,

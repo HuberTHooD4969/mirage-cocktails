@@ -385,3 +385,13 @@ tr:hover td {
   th, td { border-bottom: 1px solid #ccc; color: black; }
   .badge { border: 1px solid #000; background: transparent; color: black; }
 }
+
+/* Custom Alert Dialog Animations */
+@keyframes alertFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes alertSlideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}

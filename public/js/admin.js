@@ -3,6 +3,40 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Custom Alert Dialog ---
+    function showCustomAlert(message, type = 'info') {
+        const existing = document.getElementById('customAlertOverlay');
+        if (existing) existing.remove();
+        
+        const iconMap = {
+            success: 'fa-circle-check',
+            error: 'fa-circle-exclamation',
+            warning: 'fa-triangle-exclamation',
+            info: 'fa-circle-info'
+        };
+        const colorMap = {
+            success: '#2ec4b6',
+            error: '#ff4d4d',
+            warning: '#fca834',
+            info: 'var(--admin-gold, #d4af37)'
+        };
+        const icon = iconMap[type] || iconMap.info;
+        const color = colorMap[type] || colorMap.info;
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'customAlertOverlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:alertFadeIn 0.25s ease';
+        
+        overlay.innerHTML = `
+            <div style="background:rgba(15,15,18,0.95);border:1px solid ${color}40;border-radius:16px;padding:2.5rem;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:alertSlideUp 0.3s ease">
+                <i class="fa-solid ${icon}" style="font-size:2.5rem;color:${color};margin-bottom:1rem;display:block"></i>
+                <p style="color:#f5f5f7;font-size:1rem;line-height:1.6;margin-bottom:1.5rem;font-family:'Inter',sans-serif">${message}</p>
+                <button onclick="this.closest('#customAlertOverlay').remove()" style="background:linear-gradient(135deg,${color},${color}cc);color:#000;border:none;padding:0.7rem 2rem;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:transform 0.2s">OK</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+
     const authSection = document.getElementById('authSection');
     const dashboardSection = document.getElementById('dashboardSection');
     const sidebarSection = document.getElementById('sidebarSection');
@@ -121,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (newPassword.value !== confirmNewPassword.value) {
-                alert("New passwords do not match!");
+                showCustomAlert("New passwords do not match!");
                 return;
             }
             btnSubmitPassword.disabled = true;
@@ -142,11 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
                 
-                alert("Password updated successfully! Please log in again.");
+                showCustomAlert("Password updated successfully! Please log in again.");
                 passwordModal.classList.remove('active');
                 if (btnLogout) btnLogout.click();
             } catch (err) {
-                alert("Error: " + err.message);
+                showCustomAlert("Error: " + err.message);
             } finally {
                 btnSubmitPassword.disabled = false;
                 btnSubmitPassword.textContent = 'Update Password';
@@ -423,8 +457,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="review-label">Email:</span>
             <span class="review-val">${booking.email}</span>
 
-            <span class="review-label">Instagram:</span>
-            <span class="review-val">${booking.instagram}</span>
+            <span class="review-label">WhatsApp:</span>
+            <span class="review-val">${booking.whatsapp}</span>
 
             <span class="review-label span-full divider"></span>
 
@@ -566,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculateStockRequirements(allBookings);
 
             } catch (err) {
-                alert(`Error saving modifications: ${err.message}`);
+                showCustomAlert(`Error saving modifications: ${err.message}`);
             }
         });
     }
@@ -600,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculateStockRequirements(allBookings);
 
             } catch (err) {
-                alert(`Error deleting record: ${err.message}`);
+                showCustomAlert(`Error deleting record: ${err.message}`);
             }
         });
     }

@@ -1970,3 +1970,13 @@ h1, h2, h3, h4 {
     opacity: 0.5;
     transform: scaleX(1);
 }
+
+/* Custom Alert Dialog Animations */
+@keyframes alertFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes alertSlideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}

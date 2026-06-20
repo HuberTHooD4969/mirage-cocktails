@@ -3,6 +3,40 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Custom Alert Dialog ---
+    function showCustomAlert(message, type = 'info') {
+        const existing = document.getElementById('customAlertOverlay');
+        if (existing) existing.remove();
+        
+        const iconMap = {
+            success: 'fa-circle-check',
+            error: 'fa-circle-exclamation',
+            warning: 'fa-triangle-exclamation',
+            info: 'fa-circle-info'
+        };
+        const colorMap = {
+            success: '#2ec4b6',
+            error: '#ff4d4d',
+            warning: '#fca834',
+            info: '#d4af37'
+        };
+        const icon = iconMap[type] || iconMap.info;
+        const color = colorMap[type] || colorMap.info;
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'customAlertOverlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:alertFadeIn 0.25s ease';
+        
+        overlay.innerHTML = `
+            <div style="background:rgba(15,15,18,0.95);border:1px solid ${color}40;border-radius:16px;padding:2.5rem;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 40px ${color}15;animation:alertSlideUp 0.3s ease">
+                <i class="fa-solid ${icon}" style="font-size:2.5rem;color:${color};margin-bottom:1rem;display:block"></i>
+                <p style="color:#f5f5f7;font-size:1rem;line-height:1.6;margin-bottom:1.5rem;font-family:'Inter',sans-serif">${message}</p>
+                <button onclick="this.closest('#customAlertOverlay').remove()" style="background:linear-gradient(135deg,${color},${color}cc);color:#000;border:none;padding:0.7rem 2rem;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:transform 0.2s">OK</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+
     // ----------------------------------------------------------------------
     // 1. Navigation & Mobile Menu
     // ----------------------------------------------------------------------
@@ -254,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formName = document.getElementById('formName');
     const formEmail = document.getElementById('formEmail');
     const formPhone = document.getElementById('formPhone');
-    const formInstagram = document.getElementById('formInstagram');
+    const formWhatsapp = document.getElementById('formWhatsapp');
     const formNotes = document.getElementById('formNotes');
 
     // Select package from packages section buttons
@@ -398,18 +432,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Validation rules
     const validateStep1 = () => {
         if (!formPackage.value) {
-            alert('Please select a desired bar package.');
+            showCustomAlert('Please select a desired bar package.', 'warning');
             return false;
         }
         
         const guestCount = parseInt(formGuests.value, 10);
         if (isNaN(guestCount) || guestCount <= 0) {
-            alert('Please enter a valid guest size.');
+            showCustomAlert('Please enter a valid guest size.', 'warning');
             return false;
         }
         
         if (!formDate.value) {
-            alert('Please select an available date slot on the calendar.');
+            showCustomAlert('Please select an available date slot on the calendar.', 'warning');
             return false;
         }
 
@@ -418,15 +452,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const validateStep2 = () => {
         if (!formName.value.trim()) {
-            alert('Please enter your full name.');
+            showCustomAlert('Please enter your full name.', 'warning');
             return false;
         }
         if (!formEmail.value.trim() || !formEmail.checkValidity()) {
-            alert('Please enter a valid email address.');
+            showCustomAlert('Please enter a valid email address.', 'warning');
             return false;
         }
         if (!formPhone.value.trim()) {
-            alert('Please enter your phone contact.');
+            showCustomAlert('Please enter your phone contact.', 'warning');
             return false;
         }
         return true;
@@ -478,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnSubmitBooking) {
         btnSubmitBooking.addEventListener('click', async () => {
             if (!policyAgreement.checked) {
-                alert('Please check the authorization box to complete the booking payment.');
+                showCustomAlert('Please check the authorization box to complete the booking payment.', 'warning');
                 return;
             }
 
@@ -489,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: formName.value.trim(),
                 email: formEmail.value.trim(),
                 phone: formPhone.value.trim(),
-                instagram: formInstagram.value.trim(),
+                whatsapp: formWhatsapp.value.trim(),
                 date: formDate.value,
                 guests: parseInt(formGuests.value, 10),
                 packageType: formPackage.value,
@@ -570,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Show success modal
                             successModal.classList.add('active');
                         } catch (verifyErr) {
-                            alert(`Verification failed: ${verifyErr.message}\nYour booking request was created (ID: ${b.id}). Please contact support with this ID and reference: ${paystackResponse.reference} to verify.`);
+                            showCustomAlert(`Verification failed: ${verifyErr.message}\nYour booking request was created (ID: ${b.id}). Please contact support with this ID and reference: ${paystackResponse.reference} to verify.`, 'error');
                         } finally {
                             btnSubmitBooking.disabled = false;
                             btnSubmitBooking.innerHTML = 'Secure Deposit Payment & Book <i class="fa-solid fa-lock" style="margin-left:6px;"></i>';
@@ -578,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         })();
                     },
                     onClose: function() {
-                        alert(`Checkout closed. Your booking request (ID: ${b.id}) is saved as PENDING. Contact support to finalize deposit payment.`);
+                        showCustomAlert(`Checkout closed. Your booking request (ID: ${b.id}) is saved as PENDING. Contact support to finalize deposit payment.`, 'warning');
                         btnSubmitBooking.disabled = false;
                         btnSubmitBooking.innerHTML = 'Secure Deposit Payment & Book <i class="fa-solid fa-lock" style="margin-left:6px;"></i>';
                     }
@@ -594,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 handler.openIframe();
 
             } catch (err) {
-                alert(`Checkout transaction failed: ${err.message}`);
+                showCustomAlert(`Checkout transaction failed: ${err.message}`, 'error');
                 btnSubmitBooking.disabled = false;
                 btnSubmitBooking.innerHTML = 'Secure Deposit Payment & Book <i class="fa-solid fa-lock" style="margin-left:6px;"></i>';
             }
@@ -611,7 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('formName').value = '';
             document.getElementById('formEmail').value = '';
             document.getElementById('formPhone').value = '';
-            document.getElementById('formInstagram').value = '';
+            document.getElementById('formWhatsapp').value = '';
             document.getElementById('formNotes').value = '';
             
             formGuests.value = '';
