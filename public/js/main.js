@@ -698,4 +698,99 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fallback: show everything immediately if no observer support
         revealElements.forEach(el => el.classList.add('revealed'));
     }
+
+    // ----------------------------------------------------------------------
+    // 9. PWA Service Worker & Custom Install Banner
+    // ----------------------------------------------------------------------
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+                .catch(err => console.error('Service Worker registration failed:', err));
+        });
+    }
+
+    let deferredPrompt = null;
+    const pwaInstallBanner = document.getElementById('pwaInstallBanner');
+    const btnPwaInstall = document.getElementById('btnPwaInstall');
+    const btnPwaClose = document.getElementById('btnPwaClose');
+    const pwaInstructionText = document.getElementById('pwaInstructionText');
+
+    const showPwaBanner = () => {
+        if (!pwaInstallBanner) return;
+        // Check if user dismissed it in the last 7 days
+        const lastDismissed = localStorage.getItem('pwaDismissed');
+        if (lastDismissed) {
+            const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+            if (Date.now() - parseInt(lastDismissed, 10) < oneWeekMs) {
+                return; // Don't show banner if dismissed within 7 days
+            }
+        }
+        pwaInstallBanner.style.display = 'flex';
+        setTimeout(() => pwaInstallBanner.classList.add('show'), 50);
+    };
+
+    const hidePwaBanner = () => {
+        if (!pwaInstallBanner) return;
+        pwaInstallBanner.classList.remove('show');
+        setTimeout(() => {
+            pwaInstallBanner.style.display = 'none';
+        }, 400);
+    };
+
+    // Detect iOS Safari specifically
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone === true;
+
+    // Show custom prompt for iOS Safari users
+    if (isIOS && !isStandalone) {
+        if (pwaInstructionText && btnPwaInstall) {
+            pwaInstructionText.innerHTML = 'Tap the share icon <i class="fa-solid fa-share-from-square" style="color:var(--gold);"></i> and select <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus" style="color:var(--gold);"></i> to install this app on your iPhone!';
+            btnPwaInstall.textContent = 'Got It';
+            
+            // Show banner after 4 seconds of page load
+            setTimeout(showPwaBanner, 4000);
+            
+            btnPwaInstall.addEventListener('click', () => {
+                localStorage.setItem('pwaDismissed', Date.now());
+                hidePwaBanner();
+            });
+        }
+    }
+
+    // Chrome/Android prompt logic
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent default browser banner
+        e.preventDefault();
+        deferredPrompt = e;
+        // Show our beautiful custom banner
+        setTimeout(showPwaBanner, 3000);
+    });
+
+    if (btnPwaInstall) {
+        btnPwaInstall.addEventListener('click', async () => {
+            if (isIOS) return; // iOS installation handled separately
+            if (!deferredPrompt) return;
+            // Show browser prompt
+            deferredPrompt.prompt();
+            // Wait for user choice
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`PWA install choice: ${outcome}`);
+            deferredPrompt = null;
+            hidePwaBanner();
+        });
+    }
+
+    if (btnPwaClose) {
+        btnPwaClose.addEventListener('click', () => {
+            // Dismiss for 7 days
+            localStorage.setItem('pwaDismissed', Date.now());
+            hidePwaBanner();
+        });
+    }
+
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('Mirage Cocktails PWA was installed successfully.');
+        hidePwaBanner();
+    });
 });

@@ -15,6 +15,10 @@
     <link rel="stylesheet" href="css/style.css">
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <!-- PWA Mobile Theme Color -->
+    <meta name="theme-color" content="#0d0d11">
 </head>
 <body>
     <!-- Ambient 3D Parallax Background elements -->
@@ -530,6 +534,21 @@
             <p>&copy; 2026 Mirage Cocktails. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- PWA Install Prompt Banner -->
+    <div id="pwaInstallBanner" class="pwa-banner" style="display: none;">
+        <div class="pwa-content">
+            <img src="assets/logo.jpg" alt="Mirage App" class="pwa-logo">
+            <div class="pwa-text">
+                <h3>Install Mirage Cocktails</h3>
+                <p id="pwaInstructionText">Add Mirage Cocktails to your home screen for quick offline access!</p>
+            </div>
+        </div>
+        <div class="pwa-buttons">
+            <button id="btnPwaClose" class="btn-pwa-secondary">Later</button>
+            <button id="btnPwaInstall" class="btn-pwa-primary">Install</button>
+        </div>
+    </div>
 
     <!-- Paystack Checkout Integration -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
