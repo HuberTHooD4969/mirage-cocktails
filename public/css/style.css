@@ -1985,106 +1985,119 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
-   PWA Install Banner
+   PWA Install Banner (Centered Modal)
    ========================================================================== */
 .pwa-banner {
     position: fixed;
-    bottom: 24px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(100px);
+    transform: translate(-50%, -50%) scale(0.9);
     width: calc(100% - 32px);
-    max-width: 480px;
-    background: rgba(15, 15, 18, 0.95);
-    border: 1px solid rgba(212, 175, 55, 0.25);
-    border-radius: 16px;
-    padding: 1.25rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.05);
-    z-index: 9999;
+    max-width: 400px;
+    background: rgba(15, 15, 18, 0.96);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.1);
+    z-index: 99999;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease;
+    align-items: center;
+    gap: 1.5rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
     opacity: 0;
+    pointer-events: none;
 }
 
 .pwa-banner.show {
-    transform: translateX(-50%) translateY(0);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
+    pointer-events: auto;
 }
 
 .pwa-content {
     display: flex;
+    flex-direction: column;
     align-items: center;
+    text-align: center;
     gap: 1rem;
 }
 
 .pwa-logo {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    border: 1.5px solid var(--gold);
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
     object-fit: cover;
+    margin-bottom: 0.5rem;
 }
 
 .pwa-text h3 {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
     color: var(--text-light);
-    margin-bottom: 2px;
-    font-weight: 600;
+    margin-bottom: 6px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .pwa-text p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .pwa-buttons {
     display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
 }
 
 .btn-pwa-primary {
+    flex: 1;
     background: linear-gradient(135deg, var(--gold), var(--gold-dark));
     color: #000;
     border: none;
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
 }
 
 .btn-pwa-primary:hover {
-    transform: translateY(-1px);
-    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
 }
 
 .btn-pwa-secondary {
+    flex: 1;
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-light);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    text-align: center;
 }
 
 .btn-pwa-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 480px) {
     .pwa-banner {
-        bottom: 16px;
-        width: calc(100% - 24px);
-        padding: 1rem;
-        gap: 0.8rem;
+        width: calc(100% - 32px);
+        padding: 1.75rem 1.5rem;
+        gap: 1.25rem;
     }
 }
