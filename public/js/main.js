@@ -345,10 +345,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Custom Pricing (> 200 Guests)
         if (guestCount > 200) {
-            currentCalculation.total = 'Custom Quote';
-            currentCalculation.deposit = 'Pending Quote';
-            currentCalculation.balance = 'Pending Quote';
-            currentCalculation.balanceDueDate = 'N/A';
+            const total = 13000;
+            currentCalculation.total = total;
+            currentCalculation.deposit = total * 0.70;
+            currentCalculation.balance = total * 0.30;
+            
+            if (eventDateStr) {
+                const eventDate = new Date(eventDateStr);
+                const dueDate = new Date(eventDate.getTime() - (14 * 24 * 60 * 60 * 1000));
+                currentCalculation.balanceDueDate = dueDate.toISOString().split('T')[0];
+            } else {
+                currentCalculation.balanceDueDate = 'Pending Date';
+            }
         } else {
             const basePrice = prices[pkg] || 0;
             const total = basePrice;
@@ -546,18 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const b = data.booking;
 
-                // 2. Custom quote fallback (if guests > 200) - skip Paystack checkout
-                if (b.isCustom) {
-                    successBookingId.textContent = b.id;
-                    successName.textContent = b.name;
-                    successDeposit.textContent = 'Pending Quote';
-                    successBalance.textContent = 'Pending Quote';
-                    successDueDate.textContent = b.balanceDueDate;
-                    
-                    // Show success modal
-                    successModal.classList.add('active');
-                    return;
-                }
+                // We no longer skip Paystack for custom quotes, proceed to payment with the calculated deposit.
 
                 // 3. Open Paystack Checkout Popup for standard bookings
                 if (!paystackPublicKey) {

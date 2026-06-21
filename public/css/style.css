@@ -1762,12 +1762,7 @@ h1, h2, h3, h4 {
 }
 
 .calendar-day.booked::after {
-    content: '🔒';
-    font-size: 0.55rem;
-    position: absolute;
-    bottom: 1px;
-    right: 1px;
-    opacity: 0.5;
+    display: none;
 }
 
 .calendar-day.selected {
