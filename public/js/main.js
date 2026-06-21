@@ -321,6 +321,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (formGuests) formGuests.addEventListener('input', calculateCosts);
 
+    // Real-time invoice text updates as user types contact info
+    [formName, formEmail, formPhone, formWhatsapp].forEach(el => {
+        if (el) el.addEventListener('input', updateInvoiceScreen);
+    });
+
     // Dynamic calculations object
     let currentCalculation = {
         packageType: '',
@@ -337,7 +342,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const guestCount = parseInt(formGuests.value, 10);
         const eventDateStr = formDate.value;
 
-        if (!pkg || isNaN(guestCount) || guestCount <= 0) return;
+        if (!pkg || isNaN(guestCount) || guestCount <= 0) {
+            currentCalculation.packageType = '';
+            currentCalculation.packageName = '';
+            currentCalculation.guests = 0;
+            currentCalculation.total = 0;
+            currentCalculation.deposit = 0;
+            currentCalculation.balance = 0;
+            currentCalculation.balanceDueDate = '';
+            updateInvoiceScreen();
+            return;
+        }
 
         currentCalculation.packageType = pkg;
         currentCalculation.packageName = packageNames[pkg] || pkg;

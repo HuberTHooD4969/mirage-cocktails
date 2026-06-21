@@ -37,6 +37,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Async wrapper to handle errors in Express async route handlers
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
 // Rate Limiters
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -200,6 +205,7 @@ const db = new sqlite3.Database(DB_FILE, (err) => {
     console.error("[Mirage DB] SQLite database connection failure:", err);
   } else {
     console.log("[Mirage DB] SQLite Database connected.");
+    db.run("PRAGMA busy_timeout = 3000");
   }
 });
 
@@ -380,10 +386,10 @@ const updateBooking = (id, b) => {
   return new Promise((resolve, reject) => {
     db.run(`
       UPDATE bookings 
-      SET name = ?, guests = ?, totalPrice = ?, status = ?, notes = ?, updatedAt = ?
+      SET name = ?, guests = ?, totalPrice = ?, deposit = ?, balance = ?, isCustom = ?, status = ?, notes = ?, updatedAt = ?
       WHERE id = ?
     `, [
-      b.name, b.guests, String(b.totalPrice), b.status, b.notes || '', new Date().toISOString(), id
+      b.name, b.guests, String(b.totalPrice), String(b.deposit), String(b.balance), b.isCustom ? 1 : 0, b.status, b.notes || '', new Date().toISOString(), id
     ], function(err) {
       if (err) {
         console.error("[Mirage DB] UPDATE booking error:", err);
@@ -472,7 +478,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // Admin Authentication Login (Username & Password)
-app.post('/api/auth/login', authLimiter, async (req, res) => {
+app.post('/api/auth/login', authLimiter, asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
   if (username !== ADMIN_USER) {
@@ -498,10 +504,10 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 
   const token = signToken(username);
   res.json({ token, message: 'Authentication successful. Gate unlocked!' });
-});
+}));
 
 // Update Admin Password
-app.put('/api/auth/password', authenticateAdmin, async (req, res) => {
+app.put('/api/auth/password', authenticateAdmin, asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   if (!currentPassword || !newPassword) {
     return res.status(400).json({ error: 'Missing password fields.' });
@@ -533,27 +539,38 @@ app.put('/api/auth/password', authenticateAdmin, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to update password in database.' });
   }
-});
+}));
 
 // Get Availability (blocked dates)
-app.get('/api/availability', async (req, res) => {
+app.get('/api/availability', asyncHandler(async (req, res) => {
   const bookings = await getAllBookings();
   const blockedDates = bookings
     .filter(b => b.status !== 'Cancelled')
     .map(b => b.date);
   
   res.json(blockedDates);
-});
+}));
 
 // Helper to sanitize HTML tags from inputs
 const sanitizeInput = (str) => typeof str === 'string' ? str.replace(/<[^>]*>?/gm, '').trim() : str;
 
 // Create a booking with advanced specs
-app.post('/api/bookings', bookingLimiter, async (req, res) => {
+app.post('/api/bookings', bookingLimiter, asyncHandler(async (req, res) => {
   let { 
     name, email, phone, whatsapp, notes,
     date, guests, packageType
   } = req.body;
+
+  // Validate data types to prevent server crashes
+  if (typeof name !== 'string' || typeof email !== 'string' || typeof phone !== 'string' || typeof packageType !== 'string') {
+    return res.status(400).json({ error: 'Invalid input types.' });
+  }
+  if (whatsapp && typeof whatsapp !== 'string') {
+    return res.status(400).json({ error: 'Invalid whatsapp input type.' });
+  }
+  if (notes && typeof notes !== 'string') {
+    return res.status(400).json({ error: 'Invalid notes input type.' });
+  }
 
   // Sanitize text inputs to prevent XSS
   name = sanitizeInput(name);
@@ -571,6 +588,19 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
 
   if (isNaN(guestCount) || guestCount <= 0) {
     return res.status(400).json({ error: 'Guests count must be a positive number.' });
+  }
+
+  // Validate that the date is at least 14 days in the future
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const eventDateObj = new Date(date);
+  if (isNaN(eventDateObj.getTime())) {
+    return res.status(400).json({ error: 'Invalid event date format.' });
+  }
+
+  const minBookingLimit = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000));
+  if (eventDateObj < minBookingLimit) {
+    return res.status(400).json({ error: 'Bookings must be placed at least 14 days in advance.' });
   }
 
   // Check if date is already booked
@@ -604,10 +634,7 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
   let deposit = totalPrice * 0.70;
   let balance = totalPrice * 0.30;
 
-
-
   // Dates calculations
-  const eventDateObj = new Date(date);
   const balanceDueObj = new Date(eventDateObj.getTime() - (14 * 24 * 60 * 60 * 1000));
   const formattedBalanceDueDate = balanceDueObj.toISOString().split('T')[0];
 
@@ -661,10 +688,10 @@ app.post('/api/bookings', bookingLimiter, async (req, res) => {
   } else {
     return res.status(500).json({ error: 'Failed to write booking record to database.' });
   }
-});
+}));
 
 // Paystack Real Payment Verification Endpoint
-app.post('/api/bookings/:id/verify-payment', async (req, res) => {
+app.post('/api/bookings/:id/verify-payment', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { reference } = req.body;
 
@@ -672,77 +699,86 @@ app.post('/api/bookings/:id/verify-payment', async (req, res) => {
     return res.status(400).json({ error: 'Paystack payment reference is required.' });
   }
 
-  try {
-    const booking = await getBookingById(id);
-    if (!booking) {
-      return res.status(404).json({ error: 'Booking not found.' });
-    }
-
-    if (booking.status !== 'Pending') {
-      return res.status(400).json({ error: 'Booking status is not Pending.' });
-    }
-
-    if (isNaN(Number(booking.deposit))) {
-      return res.status(400).json({ error: 'Custom booking quote is pending. Payment cannot be verified yet.' });
-    }
-
-    // Verify payment status with Paystack API
-    const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
-    if (!paystackSecret) {
-      console.error("[Paystack Error] Paystack Secret Key is missing in environment variables.");
-      return res.status(500).json({ error: 'Payment gateway configuration error.' });
-    }
-
-    const paystackUrl = `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`;
-    const response = await fetch(paystackUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${paystackSecret}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.status || data.data.status !== 'success') {
-      return res.status(400).json({ error: 'Payment verification failed at Paystack.' });
-    }
-
-    // Paystack returns amount in minor units (GHS * 100 = pesewas)
-    const expectedAmountPesewas = Math.round(Number(booking.deposit) * 100);
-    const actualAmountPesewas = data.data.amount;
-    const actualCurrency = data.data.currency;
-
-    if (actualCurrency !== 'GHS') {
-      return res.status(400).json({ error: 'Payment currency mismatch.' });
-    }
-
-    // Check if paid amount matches expected deposit amount (allow up to 1 GHS variance for safety)
-    if (Math.abs(actualAmountPesewas - expectedAmountPesewas) > 100) {
-      return res.status(400).json({ error: 'Payment amount mismatch.' });
-    }
-
-    // Confirm booking and update status
-    const success = await updateBookingStatus(id, 'Deposit Paid', reference);
-    if (success) {
-      const alertMsg = `Payment confirmed via Paystack (Ref: ${reference}). Your deposit of GHC ${Number(booking.deposit).toLocaleString()} has been received.`;
-      logNotification(id, 'Deposit Confirmation', booking.email, alertMsg);
-
-      // Fetch the updated booking to return
-      const updatedBooking = await getBookingById(id);
-      return res.json({ message: 'Payment verified and deposit confirmed successfully.', booking: updatedBooking });
-    } else {
-      return res.status(500).json({ error: 'Failed to update booking status in database.' });
-    }
-
-  } catch (err) {
-    console.error('Paystack verification error:', err);
-    return res.status(500).json({ error: 'Payment verification failed due to internal error.' });
+  // Prevent replay attacks/using someone else's payment reference
+  if (!reference.startsWith(id + '_') && reference !== id) {
+    return res.status(400).json({ error: 'Payment reference does not match this booking.' });
   }
-});
+
+  const booking = await getBookingById(id);
+  if (!booking) {
+    return res.status(404).json({ error: 'Booking not found.' });
+  }
+
+  if (booking.status !== 'Pending') {
+    return res.status(400).json({ error: 'Booking status is not Pending.' });
+  }
+
+  if (isNaN(Number(booking.deposit))) {
+    return res.status(400).json({ error: 'Custom booking quote is pending. Payment cannot be verified yet.' });
+  }
+
+  // Check if this payment reference has already been used on another booking to prevent double-spending
+  const referenceUsed = await new Promise((resolve) => {
+    db.get("SELECT id FROM bookings WHERE paymentReference = ? AND id != ?", [reference, id], (err, row) => {
+      resolve(!!row);
+    });
+  });
+  if (referenceUsed) {
+    return res.status(400).json({ error: 'This payment reference has already been used.' });
+  }
+
+  // Verify payment status with Paystack API
+  const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+  if (!paystackSecret) {
+    console.error("[Paystack Error] Paystack Secret Key is missing in environment variables.");
+    return res.status(500).json({ error: 'Payment gateway configuration error.' });
+  }
+
+  const paystackUrl = `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`;
+  const response = await fetch(paystackUrl, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${paystackSecret}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.status || data.data.status !== 'success') {
+    return res.status(400).json({ error: 'Payment verification failed at Paystack.' });
+  }
+
+  // Paystack returns amount in minor units (GHS * 100 = pesewas)
+  const expectedAmountPesewas = Math.round(Number(booking.deposit) * 100);
+  const actualAmountPesewas = data.data.amount;
+  const actualCurrency = data.data.currency;
+
+  if (actualCurrency !== 'GHS') {
+    return res.status(400).json({ error: 'Payment currency mismatch.' });
+  }
+
+  // Check if paid amount matches expected deposit amount (allow up to 1 GHS variance for safety)
+  if (Math.abs(actualAmountPesewas - expectedAmountPesewas) > 100) {
+    return res.status(400).json({ error: 'Payment amount mismatch.' });
+  }
+
+  // Confirm booking and update status
+  const success = await updateBookingStatus(id, 'Deposit Paid', reference);
+  if (success) {
+    const alertMsg = `Payment confirmed via Paystack (Ref: ${reference}). Your deposit of GHC ${Number(booking.deposit).toLocaleString()} has been received.`;
+    logNotification(id, 'Deposit Confirmation', booking.email, alertMsg);
+
+    // Fetch the updated booking to return
+    const updatedBooking = await getBookingById(id);
+    return res.json({ message: 'Payment verified and deposit confirmed successfully.', booking: updatedBooking });
+  } else {
+    return res.status(500).json({ error: 'Failed to update booking status in database.' });
+  }
+}));
 
 // Mock/Local fallback endpoint to manually confirm booking without real payments
-app.post('/api/bookings/:id/confirm-deposit', async (req, res) => {
+app.post('/api/bookings/:id/confirm-deposit', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const booking = await getBookingById(id);
 
@@ -766,20 +802,20 @@ app.post('/api/bookings/:id/confirm-deposit', async (req, res) => {
   } else {
     res.status(500).json({ error: 'Failed to update status.' });
   }
-});
+}));
 
 // ----------------------------------------------------------------------
 // PROTECTED BACKOFFICE ADMIN APIS (Requires JWT)
 // ----------------------------------------------------------------------
 
 // Get all bookings
-app.get('/api/bookings', authenticateAdmin, async (req, res) => {
+app.get('/api/bookings', authenticateAdmin, asyncHandler(async (req, res) => {
   const bookings = await getAllBookings();
   res.json(bookings);
-});
+}));
 
 // Update booking details / custom quotes / payment status
-app.patch('/api/bookings/:id', authenticateAdmin, async (req, res) => {
+app.patch('/api/bookings/:id', authenticateAdmin, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
   
@@ -810,10 +846,10 @@ app.patch('/api/bookings/:id', authenticateAdmin, async (req, res) => {
   } else {
     res.status(500).json({ error: 'Failed to save updates.' });
   }
-});
+}));
 
 // Update booking status specific endpoint
-app.patch('/api/bookings/:id/status', authenticateAdmin, async (req, res) => {
+app.patch('/api/bookings/:id/status', authenticateAdmin, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const validStatuses = ['Pending', 'Deposit Paid', 'Fully Paid', 'Cancelled', 'Refunded'];
@@ -838,10 +874,10 @@ app.patch('/api/bookings/:id/status', authenticateAdmin, async (req, res) => {
   } else {
     res.status(500).json({ error: 'Failed to update status.' });
   }
-});
+}));
 
 // Delete (Remove) booking completely
-app.delete('/api/bookings/:id', authenticateAdmin, async (req, res) => {
+app.delete('/api/bookings/:id', authenticateAdmin, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const exists = await getBookingById(id);
 
@@ -856,7 +892,7 @@ app.delete('/api/bookings/:id', authenticateAdmin, async (req, res) => {
   } else {
     res.status(500).json({ error: 'Failed to delete record.' });
   }
-});
+}));
 
 // Fallback routing to client app
 app.get('*', (req, res) => {

@@ -356,10 +356,11 @@ document.addEventListener('DOMContentLoaded', () => {
             totalGuests += b.guests;
             
             // Silver = 3 drinks/guest, Gold = 4, Premium = 5, Custom = 4
+            const type = (b.packageType || '').toLowerCase();
             let drinksMultiplier = 4;
-            if (b.packageType === 'silver') drinksMultiplier = 3;
-            if (b.packageType === 'gold') drinksMultiplier = 4;
-            if (b.packageType === 'premium') drinksMultiplier = 5;
+            if (type === 'silver') drinksMultiplier = 3;
+            if (type === 'gold') drinksMultiplier = 4;
+            if (type === 'premium') drinksMultiplier = 5;
 
             // Extra duration drinks (adds +1 drink per extra hour)
             const baseHours = 5;
