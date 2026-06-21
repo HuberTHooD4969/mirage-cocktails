@@ -647,6 +647,72 @@ tr:hover td {
   h1, h2, h3, h4, h5 { color: black; }
 }
 
+/* ==========================================================================
+   Mobile Responsiveness
+   ========================================================================== */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--admin-border);
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    justify-content: center;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 1rem 0.5rem;
+    gap: 0.5rem;
+  }
+  .nav-item {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+    flex: 1 1 calc(50% - 1rem);
+    justify-content: center;
+  }
+  #navChangePassword {
+    margin-top: 0 !important;
+    border-top: none !important;
+    padding-top: 0.6rem !important;
+  }
+  .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+  .top-header {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+  }
+  .dashboard-content {
+    padding: 1rem;
+  }
+  .metrics-grid, .stock-grid {
+    grid-template-columns: 1fr;
+  }
+  .filters-row {
+    flex-direction: column;
+  }
+  .filter-input {
+    min-width: 100%;
+  }
+  .admin-auth-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
 /* Custom Alert Dialog Animations */
 @keyframes alertFadeIn {
     from { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
