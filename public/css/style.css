@@ -1510,6 +1510,11 @@ h1, h2, h3, h4 {
         max-width: 400px;
         margin: 0 auto;
     }
+    
+    .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1565,8 +1570,11 @@ h1, h2, h3, h4 {
         padding: 2rem 1.5rem;
     }
     
-    .booking-card-3d {
-        /* Layout adjustments only, no transforms */
+    /* Prevent iOS zoom on input focus by setting font-size to 16px (1rem) */
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+        font-size: 1rem;
     }
     
     .footer-container {
