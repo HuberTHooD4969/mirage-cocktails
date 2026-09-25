@@ -2101,3 +2101,96 @@ h1, h2, h3, h4 {
         gap: 1.25rem;
     }
 }
+
+/* Keep the first render stable on narrow screens while reveal animations initialize. */
+@media (max-width: 600px) {
+    .ambient-glow {
+        width: 70vw;
+        height: 70vw;
+        max-width: 270px;
+        max-height: 270px;
+    }
+
+    .glow-1 {
+        left: 0;
+    }
+
+    .glow-2 {
+        right: 0;
+    }
+
+    .glow-3 {
+        left: 10%;
+    }
+
+    .scroll-reveal,
+    .scroll-reveal.reveal-left,
+    .scroll-reveal.reveal-right,
+    .scroll-reveal.reveal-up {
+        opacity: 1;
+        transform: none;
+    }
+
+    .header-container {
+        padding: 0 1rem;
+    }
+
+    .brand-name {
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .hero-section,
+    .packages-section,
+    .booking-section,
+    .terms-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .hero-section {
+        gap: 2.5rem;
+    }
+
+    .hero-title {
+        font-size: 2.25rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .hero-actions {
+        width: 100%;
+        gap: 0.75rem;
+    }
+
+    .booking-card-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .form-side-title {
+        font-size: 1.45rem;
+    }
+
+    .calendar-wrapper {
+        padding: 0.65rem;
+    }
+
+    .calendar-day {
+        padding: 6px 0;
+        font-size: 0.8rem;
+    }
+
+    .terms-content-side h2 {
+        font-size: 2.1rem;
+    }
+
+    .term-item {
+        gap: 1rem;
+    }
+
+    .contact-card-glass {
+        padding: 1.25rem;
+    }
+}
