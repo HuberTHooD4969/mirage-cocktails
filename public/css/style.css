@@ -2094,11 +2094,32 @@ h1, h2, h3, h4 {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+@media (max-width: 600px) {
+    .scroll-reveal,
+    .scroll-reveal.reveal-left,
+    .scroll-reveal.reveal-right,
+    .scroll-reveal.reveal-up {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
 @media (max-width: 480px) {
     .pwa-banner {
         width: calc(100% - 32px);
         padding: 1.75rem 1.5rem;
         gap: 1.25rem;
+    }
+}
+
+/* Final mobile animation override must follow the animation definitions below. */
+@media (max-width: 600px) {
+    .scroll-reveal,
+    .scroll-reveal.reveal-left,
+    .scroll-reveal.reveal-right,
+    .scroll-reveal.reveal-up {
+        opacity: 1 !important;
+        transform: none !important;
     }
 }
 
