@@ -23,8 +23,8 @@ const ADMIN_USER = process.env.ADMIN_USER || (NODE_ENV === 'production' ? null :
 const ADMIN_PASS = process.env.ADMIN_PASS || (NODE_ENV === 'production' ? null : 'MIRAGE26');
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM || 'admin@miragecocktails.com';
 
-if (NODE_ENV === 'production' && (!SERVER_SECRET || !ADMIN_USER || !ADMIN_PASS)) {
-  throw new Error('JWT_SECRET, ADMIN_USER, and ADMIN_PASS must be configured in production.');
+if (NODE_ENV === 'production' && !SERVER_SECRET) {
+  throw new Error('JWT_SECRET must be configured in production.');
 }
 
 let activeAdminOtp = { code: null, expiresAt: 0 };
@@ -500,6 +500,10 @@ app.get('/api/config', (req, res) => {
 // Admin Authentication Login (Username & Password)
 app.post('/api/auth/login', authLimiter, asyncHandler(async (req, res) => {
   const { username, password } = req.body;
+
+  if (!ADMIN_USER || !ADMIN_PASS) {
+    return res.status(503).json({ error: 'Admin authentication is not configured.' });
+  }
 
   if (username !== ADMIN_USER) {
     return res.status(401).json({ error: 'Invalid username or password.' });
