@@ -3,6 +3,24 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[character]));
+    }
+
+    function escapeBooking(value) {
+        if (Array.isArray(value)) return value.map(escapeBooking);
+        if (value && typeof value === 'object') {
+            return Object.fromEntries(Object.entries(value).map(([key, nestedValue]) => [key, escapeBooking(nestedValue)]));
+        }
+        return typeof value === 'string' ? escapeHtml(value) : value;
+    }
+
     // --- Custom Alert Dialog ---
     function showCustomAlert(message, type = 'info') {
         const existing = document.getElementById('customAlertOverlay');
@@ -30,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.innerHTML = `
             <div style="background:rgba(15,15,18,0.95);border:1px solid ${color}40;border-radius:16px;padding:2.5rem;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:alertSlideUp 0.3s ease">
                 <i class="fa-solid ${icon}" style="font-size:2.5rem;color:${color};margin-bottom:1rem;display:block"></i>
-                <p style="color:#f5f5f7;font-size:1rem;line-height:1.6;margin-bottom:1.5rem;font-family:'Inter',sans-serif">${message}</p>
+                <p style="color:#f5f5f7;font-size:1rem;line-height:1.6;margin-bottom:1.5rem;font-family:'Inter',sans-serif">${escapeHtml(message)}</p>
                 <button onclick="this.closest('#customAlertOverlay').remove()" style="background:linear-gradient(135deg,${color},${color}cc);color:#000;border:none;padding:0.7rem 2rem;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:transform 0.2s">OK</button>
             </div>
         `;
@@ -125,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 sessionStorage.removeItem('adminToken');
                 authError.style.display = 'block';
-                authError.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${err.message}`;
+                authError.textContent = err.message;
                 btnAuth.innerHTML = 'Sign In <i class="fa-solid fa-arrow-right-to-bracket"></i>';
                 btnAuth.disabled = false;
             }
@@ -270,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bookings.forEach(b => {
             const tr = document.createElement('tr');
+            const safeBooking = escapeBooking(b);
             
             const eventDate = new Date(b.date).toLocaleDateString(undefined, {
                 month: 'short',
@@ -291,15 +310,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tr.innerHTML = `
                 <td>
-                    <div style="font-weight:600; color:var(--admin-gold);">${b.id}</div>
+                    <div style="font-weight:600; color:var(--admin-gold);">${safeBooking.id}</div>
                     <div style="font-size:0.8rem; color:var(--admin-text-muted);"><i class="fa-regular fa-calendar"></i> ${eventDate}</div>
                 </td>
                 <td>
-                    <div style="font-weight:600;">${b.name}</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted);">${b.phone}</div>
+                    <div style="font-weight:600;">${safeBooking.name}</div>
+                    <div style="font-size:0.8rem; color:var(--admin-text-muted);">${safeBooking.phone}</div>
                 </td>
                 <td>
-                    <div style="font-weight:600;">${b.packageName} <span class="badge" style="background:#2d3340; font-size:0.7rem; padding:2px 6px;">${b.guests} Guests</span></div>
+                    <div style="font-weight:600;">${safeBooking.packageName} <span class="badge" style="background:#2d3340; font-size:0.7rem; padding:2px 6px;">${safeBooking.guests} Guests</span></div>
                     <div style="font-size:0.8rem; color:var(--admin-text-muted);">${b.durationHours || 5} Hours</div>
                 </td>
                 <td>
@@ -307,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="font-size:0.8rem; color:var(--admin-text-muted);">Dep: ${depositVal}</div>
                 </td>
                 <td>
-                    <span class="badge ${badgeClass}"><i class="fa-solid ${iconClass}"></i> ${b.status}</span>
+                    <span class="badge ${badgeClass}"><i class="fa-solid ${iconClass}"></i> ${safeBooking.status}</span>
                 </td>
                 <td style="text-align:right;">
                     <button class="btn btn-outline btn-roadmap" data-booking-id="${b.id}" style="padding:4px 8px; font-size:0.8rem; margin-right:4px;" title="Print Roadmap"><i class="fa-solid fa-print"></i></button>
@@ -431,8 +450,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!roadmapModal || !roadmapContent) return;
         roadmapContent.innerHTML = '';
 
-        const addonsList = booking.addons && booking.addons.length > 0 
-            ? booking.addons.map(a => a.name).join(', ') 
+        const safeBooking = escapeBooking(booking);
+        const addonsList = safeBooking.addons && safeBooking.addons.length > 0 
+            ? safeBooking.addons.map(a => a.name).join(', ')
             : 'None Selected';
 
         const totalVal = typeof booking.totalPrice === 'number' ? `GHC ${booking.totalPrice.toLocaleString()}` : booking.totalPrice;
@@ -444,39 +464,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const contentHtml = `
             <span class="review-label">Booking ID:</span>
-            <span class="review-val font-bold gold-text">${booking.id}</span>
+            <span class="review-val font-bold gold-text">${safeBooking.id}</span>
 
             <span class="review-label">Created On:</span>
-            <span class="review-val">${new Date(booking.createdAt).toLocaleString()}</span>
+            <span class="review-val">${new Date(safeBooking.createdAt).toLocaleString()}</span>
 
             <span class="review-label">Client Name:</span>
-            <span class="review-val font-semibold">${booking.name}</span>
+            <span class="review-val font-semibold">${safeBooking.name}</span>
 
             <span class="review-label">Phone Contact:</span>
-            <span class="review-val">${booking.phone}</span>
+            <span class="review-val">${safeBooking.phone}</span>
 
             <span class="review-label">Email:</span>
-            <span class="review-val">${booking.email}</span>
+            <span class="review-val">${safeBooking.email}</span>
 
             <span class="review-label">WhatsApp:</span>
-            <span class="review-val">${booking.whatsapp}</span>
+            <span class="review-val">${safeBooking.whatsapp}</span>
 
             <span class="review-label span-full divider"></span>
 
             <span class="review-label">Event Date:</span>
-            <span class="review-val font-bold">${new Date(booking.date).toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric', year:'numeric'})}</span>
+            <span class="review-val font-bold">${new Date(safeBooking.date).toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric', year:'numeric'})}</span>
 
             <span class="review-label">Guests Size:</span>
-            <span class="review-val"><span class="badge" style="margin:0; padding:2px 8px;">${booking.guests} Guests</span></span>
+            <span class="review-val"><span class="badge" style="margin:0; padding:2px 8px;">${safeBooking.guests} Guests</span></span>
 
             <span class="review-label">Bar Template:</span>
-            <span class="review-val font-semibold">${booking.barLabel || 'Compact Bar'}</span>
+            <span class="review-val font-semibold">${safeBooking.barLabel || 'Compact Bar'}</span>
 
             <span class="review-label">Add-ons Selected:</span>
             <span class="review-val">${addonsList}</span>
 
             <span class="review-label">Duration:</span>
-            <span class="review-val">${booking.durationHours || 5} Hours Service</span>
+            <span class="review-val">${safeBooking.durationHours || 5} Hours Service</span>
 
             <span class="review-label">Timeline Guide:</span>
             <span class="review-val" style="color: var(--text-warning); font-weight:600;"><i class="fa-solid fa-clock-rotate-left"></i> Arrival Required ${setupHours} Hours prior for Setup/Logistics</span>
@@ -485,14 +505,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <span class="review-label">Venue Logistics:</span>
             <span class="review-val">
-                <div>Floor level: ${booking.logistics?.floors || 0}</div>
-                <div>Elevator Access: ${booking.logistics?.elevator ? '✅ Yes' : '❌ No'}</div>
-                <div>Power socket nearby: ${booking.logistics?.powerSupply ? '✅ Confirmed' : '❌ No'}</div>
-                <div style="font-size:0.85rem; color:var(--text-muted); font-style:italic; margin-top:4px;">Delivery notes: "${booking.logistics?.notes || 'None'}"</div>
+                <div>Floor level: ${safeBooking.logistics?.floors || 0}</div>
+                <div>Elevator Access: ${safeBooking.logistics?.elevator ? '✅ Yes' : '❌ No'}</div>
+                <div>Power socket nearby: ${safeBooking.logistics?.powerSupply ? '✅ Confirmed' : '❌ No'}</div>
+                <div style="font-size:0.85rem; color:var(--text-muted); font-style:italic; margin-top:4px;">Delivery notes: "${safeBooking.logistics?.notes || 'None'}"</div>
             </span>
 
             <span class="review-label">Mileage Transport:</span>
-            <span class="review-val">${booking.mileage?.distanceKm || 0} KM (HQ to event location, transport GHC ${booking.mileage?.transportCost?.toLocaleString() || 0})</span>
+            <span class="review-val">${safeBooking.mileage?.distanceKm || 0} KM (HQ to event location, transport GHC ${safeBooking.mileage?.transportCost?.toLocaleString() || 0})</span>
 
             <span class="review-label span-full divider"></span>
 
@@ -503,15 +523,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="review-val font-semibold">${depositVal}</span>
 
             <span class="review-label">30% Balance:</span>
-            <span class="review-val">${balanceVal} (Due by ${booking.balanceDueDate})</span>
+            <span class="review-val">${balanceVal} (Due by ${safeBooking.balanceDueDate})</span>
 
             <span class="review-label">Order Status:</span>
-            <span class="review-val"><span class="status-badge" style="background: rgba(212,175,55,0.1); border:1px solid var(--gold); color:var(--gold-light); font-size:0.75rem;">${booking.status}</span></span>
+            <span class="review-val"><span class="status-badge" style="background: rgba(212,175,55,0.1); border:1px solid var(--gold); color:var(--gold-light); font-size:0.75rem;">${safeBooking.status}</span></span>
 
-            ${booking.notes ? `
+            ${safeBooking.notes ? `
                 <span class="review-label span-full divider"></span>
                 <span class="review-label">Client Notes:</span>
-                <span class="review-val" style="font-style:italic;">"${booking.notes}"</span>
+                <span class="review-val" style="font-style:italic;">"${safeBooking.notes}"</span>
             ` : ''}
         `;
 
