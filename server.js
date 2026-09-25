@@ -16,11 +16,16 @@ const DB_FILE = path.join(__dirname, 'data', 'mirage.db');
 const LOGS_DIR = path.join(__dirname, 'logs');
 const NOTIFICATION_LOG = path.join(LOGS_DIR, 'notifications.log');
 
-// Load secrets from environment variables (fallback to defaults for local dev)
-const SERVER_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
-const ADMIN_USER = process.env.ADMIN_USER || 'MIRAGE';
-const ADMIN_PASS = process.env.ADMIN_PASS || 'MIRAGE26';
+// Load secrets from environment variables. Local development keeps safe fallbacks;
+// production must be explicitly configured.
+const SERVER_SECRET = process.env.JWT_SECRET || (NODE_ENV === 'production' ? null : crypto.randomBytes(32).toString('hex'));
+const ADMIN_USER = process.env.ADMIN_USER || (NODE_ENV === 'production' ? null : 'MIRAGE');
+const ADMIN_PASS = process.env.ADMIN_PASS || (NODE_ENV === 'production' ? null : 'MIRAGE26');
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM || 'admin@miragecocktails.com';
+
+if (NODE_ENV === 'production' && (!SERVER_SECRET || !ADMIN_USER || !ADMIN_PASS)) {
+  throw new Error('JWT_SECRET, ADMIN_USER, and ADMIN_PASS must be configured in production.');
+}
 
 let activeAdminOtp = { code: null, expiresAt: 0 };
 
@@ -55,6 +60,14 @@ const bookingLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,  // 1 hour
   max: 20,                    // 20 bookings per hour per IP
   message: { error: 'Too many booking requests. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many payment verification requests. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -138,7 +151,14 @@ app.post('/webhook/paystack', express.raw({ type: 'application/json' }), async (
     if (!secret) return res.status(500).send('Webhook not configured');
 
     const hash = crypto.createHmac('sha512', secret).update(req.body).digest('hex');
-    if (hash !== signature) return res.status(401).send('Invalid signature');
+    if (typeof signature !== 'string' || !/^[a-f0-9]{128}$/i.test(signature)) {
+      return res.status(401).send('Invalid signature');
+    }
+    const expectedSignature = Buffer.from(hash, 'hex');
+    const receivedSignature = Buffer.from(signature, 'hex');
+    if (!crypto.timingSafeEqual(expectedSignature, receivedSignature)) {
+      return res.status(401).send('Invalid signature');
+    }
 
     const event = JSON.parse(req.body.toString());
     console.log(`[Paystack Webhook] Received: ${event.event}`);
@@ -181,7 +201,7 @@ app.post('/webhook/paystack', express.raw({ type: 'application/json' }), async (
 
 // Middleware
 app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Ensure folders exist
@@ -691,11 +711,11 @@ app.post('/api/bookings', bookingLimiter, asyncHandler(async (req, res) => {
 }));
 
 // Paystack Real Payment Verification Endpoint
-app.post('/api/bookings/:id/verify-payment', asyncHandler(async (req, res) => {
+app.post('/api/bookings/:id/verify-payment', paymentLimiter, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { reference } = req.body;
 
-  if (!reference) {
+  if (typeof reference !== 'string' || !reference) {
     return res.status(400).json({ error: 'Paystack payment reference is required.' });
   }
 
@@ -749,6 +769,10 @@ app.post('/api/bookings/:id/verify-payment', asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Payment verification failed at Paystack.' });
   }
 
+  if (data.data.reference !== reference || data.data.customer?.email?.toLowerCase() !== booking.email.toLowerCase()) {
+    return res.status(400).json({ error: 'Payment transaction does not match this booking.' });
+  }
+
   // Paystack returns amount in minor units (GHS * 100 = pesewas)
   const expectedAmountPesewas = Math.round(Number(booking.deposit) * 100);
   const actualAmountPesewas = data.data.amount;
@@ -758,8 +782,7 @@ app.post('/api/bookings/:id/verify-payment', asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Payment currency mismatch.' });
   }
 
-  // Check if paid amount matches expected deposit amount (allow up to 1 GHS variance for safety)
-  if (Math.abs(actualAmountPesewas - expectedAmountPesewas) > 100) {
+  if (actualAmountPesewas !== expectedAmountPesewas) {
     return res.status(400).json({ error: 'Payment amount mismatch.' });
   }
 
@@ -777,33 +800,6 @@ app.post('/api/bookings/:id/verify-payment', asyncHandler(async (req, res) => {
   }
 }));
 
-// Mock/Local fallback endpoint to manually confirm booking without real payments
-app.post('/api/bookings/:id/confirm-deposit', asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const booking = await getBookingById(id);
-
-  if (!booking) {
-    return res.status(404).json({ error: 'Booking not found.' });
-  }
-
-  // Security: Only allow status change from Pending to Deposit Paid
-  if (booking.status !== 'Pending') {
-    return res.status(400).json({ error: 'Booking status cannot be updated via this endpoint.' });
-  }
-
-  const success = await updateBookingStatus(id, 'Deposit Paid', 'MOCK-PAYMENT-' + Date.now());
-
-  if (success) {
-    const alertMsg = `Payment received (Local Mock): Your deposit for booking ${id} has been confirmed. Status updated to "Deposit Paid".`;
-    logNotification(id, 'Deposit Confirmation', booking.email, alertMsg);
-    
-    const updated = await getBookingById(id);
-    res.json({ message: 'Deposit confirmed successfully.', booking: updated });
-  } else {
-    res.status(500).json({ error: 'Failed to update status.' });
-  }
-}));
-
 // ----------------------------------------------------------------------
 // PROTECTED BACKOFFICE ADMIN APIS (Requires JWT)
 // ----------------------------------------------------------------------
@@ -818,13 +814,38 @@ app.get('/api/bookings', authenticateAdmin, asyncHandler(async (req, res) => {
 app.patch('/api/bookings/:id', authenticateAdmin, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
+  const allowedFields = ['name', 'guests', 'totalPrice', 'status', 'notes'];
+  const hasUnknownField = Object.keys(updates).some((field) => !allowedFields.includes(field));
+  if (hasUnknownField) {
+    return res.status(400).json({ error: 'Unsupported booking fields supplied.' });
+  }
+  if (updates.name !== undefined && (typeof updates.name !== 'string' || !updates.name.trim())) {
+    return res.status(400).json({ error: 'Name must be a non-empty string.' });
+  }
+  if (updates.guests !== undefined && (!Number.isInteger(updates.guests) || updates.guests <= 0)) {
+    return res.status(400).json({ error: 'Guests must be a positive integer.' });
+  }
+  if (updates.totalPrice !== undefined && (!Number.isFinite(Number(updates.totalPrice)) || Number(updates.totalPrice) < 0)) {
+    return res.status(400).json({ error: 'Total price must be a non-negative number.' });
+  }
+  if (updates.status !== undefined && !['Pending', 'Deposit Paid', 'Fully Paid', 'Cancelled', 'Refunded'].includes(updates.status)) {
+    return res.status(400).json({ error: 'Invalid status update command.' });
+  }
+  if (updates.notes !== undefined && typeof updates.notes !== 'string') {
+    return res.status(400).json({ error: 'Notes must be a string.' });
+  }
   
   const original = await getBookingById(id);
   if (!original) {
     return res.status(404).json({ error: 'Booking not found.' });
   }
 
-  const updatedBooking = { ...original, ...updates };
+  const normalizedUpdates = {
+    ...updates,
+    ...(updates.name !== undefined ? { name: sanitizeInput(updates.name) } : {}),
+    ...(updates.notes !== undefined ? { notes: sanitizeInput(updates.notes) } : {})
+  };
+  const updatedBooking = { ...original, ...normalizedUpdates };
 
   if (updates.totalPrice !== undefined && updates.totalPrice !== original.totalPrice) {
     const numericTotal = parseFloat(updates.totalPrice);
