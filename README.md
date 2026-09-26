@@ -40,6 +40,13 @@ npm run dev
 
 The server will spin up on **[http://localhost:3000](http://localhost:3000)**.
 
+## Frontend Versions
+
+- **Version 1**: Existing vanilla HTML/CSS/JavaScript app at `/`.
+- **Version 2**: React/Vite redesign at `/v2` with a restrained professional visual system.
+
+Render builds Version 2 automatically with `npm run build:v2`. Version 1 remains available while Version 2 is reviewed.
+
 ---
 
 ## Administration Portal

@@ -2,7 +2,7 @@ services:
   - type: web
     name: mirage-cocktails
     env: node
-    buildCommand: npm install
+    buildCommand: npm install && npm run build:v2
     startCommand: node server.js
     envVars:
       - key: NODE_ENV

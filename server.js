@@ -15,6 +15,7 @@ const DATA_FILE = path.join(__dirname, 'data', 'bookings.json');
 const DB_FILE = path.join(__dirname, 'data', 'mirage.db');
 const LOGS_DIR = path.join(__dirname, 'logs');
 const NOTIFICATION_LOG = path.join(LOGS_DIR, 'notifications.log');
+const V2_DIST_DIR = path.join(__dirname, 'frontend-v2', 'dist');
 
 // Load secrets from environment variables. Local development keeps safe fallbacks;
 // production must be explicitly configured.
@@ -203,6 +204,12 @@ app.post('/webhook/paystack', express.raw({ type: 'application/json' }), async (
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+if (fs.existsSync(V2_DIST_DIR)) {
+  app.use('/v2', express.static(V2_DIST_DIR));
+  app.get('/v2/*', (req, res) => {
+    res.sendFile(path.join(V2_DIST_DIR, 'index.html'));
+  });
+}
 
 // Ensure folders exist
 const initDirs = () => {
