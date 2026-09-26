@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "build:v2": "npm --prefix frontend-v2 install && npm --prefix frontend-v2 run build",
-    "postinstall": "npm rebuild sqlite3 --build-from-source"
+    "postinstall": "npm rebuild sqlite3 --build-from-source && npm run build:v2"
   },
   "keywords": [
     "cocktails",
